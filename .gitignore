@@ -1,0 +1,55 @@
+# Python bytecode
+__pycache__/
+__init__.py
+*.py[cod]
+*$py.class
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+migrations/
+
+# Virtual Environment
+venv/
+env/
+.env
+.venv
+
+# Static and Media files
+/static/
+/media/
+
+# IDE-specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Dependency directories
+node_modules/
+
+# Secrets and sensitive information
+.env
+*.env
+.secrets
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Pytest
+.pytest_cache/
+
+# Coverage reports
+.coverage
+htmlcov/
+
+# Deployment and packaging
+*.egg-info/
+dist/
+build/
