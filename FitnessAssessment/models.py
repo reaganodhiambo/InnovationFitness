@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import When, Case, Value
 from django.db.models.functions import Concat, Cast
-
+from datetime import datetime
 
 class Customer(models.Model):
     gender = [
@@ -35,8 +35,8 @@ class TestInput(models.Model):
     metabolic_age = models.PositiveIntegerField(null=True)
     bmi = models.PositiveIntegerField(null=True)
     visceral_fat_rating = models.PositiveIntegerField(null=True)
-    one_mile_time = models.DecimalField(decimal_places=2, max_digits=4)
-    exercise_heart_rate = models.DecimalField(decimal_places=2, max_digits=4)
+    one_mile_time = models.DecimalField(decimal_places=2, max_digits=4,null=True)
+    exercise_heart_rate = models.DecimalField(decimal_places=2, max_digits=4,null=True)
     repetition_maximum = models.DecimalField(decimal_places=2, max_digits=4,null=True)
     no_of_situps = models.PositiveIntegerField(null=True)
     no_of_push_ups = models.PositiveIntegerField(null=True)
@@ -290,7 +290,7 @@ class TestPerformance(models.Model):
 class PerformanceInput(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.DO_NOTHING)
     test_id = models.ForeignKey(FitnessTest, on_delete=models.DO_NOTHING)
-    test_date = models.DateTimeField(auto_now_add=True)
+    test_date = models.DateTimeField()
     performance = models.DecimalField(max_digits=5,decimal_places=2)
 
     def __str__(self):

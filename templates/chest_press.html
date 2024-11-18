@@ -1,8 +1,7 @@
 <h1>{{ test.test_name }} </h1>
 <form method="post">    
     {% csrf_token %}
-    {{form.customer}}
-    {{form.performance}}
+    {{form.as_p}}
     <p hidden> {{form.test_id}} </p>
     <button type="submit">Add</button>
 </form>

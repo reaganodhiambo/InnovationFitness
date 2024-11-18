@@ -4,13 +4,13 @@ from .models import *
 from .utils import calculate_one_mile_test
 from django.db import connection
 from django.db.models import Case, When, PositiveIntegerField, CharField, Value, Max
-
+import datetime
 
 # Create your views here.
 def index(request):
     tests = FitnessTest.objects.all()
-    context = {"tests":tests}
-    return render(request, "home.html",context=context)
+    context = {"tests": tests}
+    return render(request, "home.html", context=context)
 
 
 def registerCustomer(request):
@@ -20,7 +20,7 @@ def registerCustomer(request):
             customer_id = form.cleaned_data.get("id")
             form.save()
             HttpResponse("Customer Registered")
-            return redirect("one_mile_test")
+            return redirect("onemiletest")
 
         else:
             return HttpResponse("Invalid Form")
@@ -37,6 +37,8 @@ def chestPress(request):
 
     print(test.id, test.test_name, test.category)
 
+    weight = TestInput.objects.get(id=test.id)
+
     if request.method == "POST":
         form = ChestPressForm(request.POST)
 
@@ -46,8 +48,7 @@ def chestPress(request):
             form.save()
             message = test.test_name + " Recorded"
             return HttpResponse(message)
-        else:
-            return HttpResponse("Invalid Form")
+
     else:
         form = ChestPressForm(initial={"test_id": test})
     context = {
@@ -100,6 +101,7 @@ def updatePerformance(request):
 
 
 def oneMileTest(request):
+    test_name = FitnessTest.objects.filter(test_name__icontains="mile")[0]
     if request.method == "POST":
         # customer = Customer.objects.get(id=customer_id)
         form = OneMileTestForm(request.POST)
@@ -109,6 +111,24 @@ def oneMileTest(request):
             exercise_heart_rate = form.cleaned_data["exercise_heart_rate"]
             one_mile_time = form.cleaned_data["one_mile_time"]
 
+            customer_instance = Customer.objects.get(id=customer.id)
+
+            performance = calculate_one_mile_test(
+                weight=weight,
+                age=customer_instance.age,
+                gender=customer_instance.gender,
+                time=one_mile_time,
+                heart_rate=exercise_heart_rate,
+            )
+
+            scoring = one_mile_test_rating(
+                gender=customer_instance.gender,
+                age=customer_instance.age,
+                performance=performance,
+            )
+            print('performance: ', performance)
+            print(scoring)
+
             new, created = TestInput.objects.update_or_create(
                 customer=customer,
                 defaults={
@@ -116,12 +136,17 @@ def oneMileTest(request):
                     "exercise_heart_rate": exercise_heart_rate,
                 },
             )
+            record_test_score(
+                customer=customer,
+                test_name=test_name,
+                rating=scoring["rating"],
+                score=scoring["user_score"],
+                test_date=datetime.date(2024,10,15)
+            )
             if created:
                 return HttpResponse("Test Input Saved")
             else:
                 return HttpResponse("Test Input Updated")
-            # form.save()
-            # return HttpResponse("One Mile Test Added")
 
     else:
         form = OneMileTestForm()
@@ -151,60 +176,26 @@ def testInput(request):
     return render(request, "testinput.html", context=context)
 
 
-def calculate_results(request):
-    input_data = TestInput.objects.all()
-    for input_instance in input_data:
-        age = input_instance.customer.age
-        weight = input_instance.weight_in_kg
-        gender = input_instance.customer.gender
-        heart_rate = input_instance.exercise_heart_rate
-        one_mile_time = input_instance.one_mile_time
-        # one mile test
-        one_mile = calculate_one_mile_test(
-            weight=weight,
-            age=age,
-            gender=gender,
-            time=one_mile_time,
-            heart_rate=heart_rate,
-        )
-        gender_value = 1 if gender == "Male" else 0
-        expected_performance = OneMileTestPerformance.objects.filter(
-            min_age__lte=age,
-            max_age__gte=age,
-            gender__gender=gender,
-        )
-
-        for result in expected_performance:
-            if result.limit_type.type == "from":
-                print(result.performance)
-            elif result.limit_type == "above":
-                print(result.performance)
-            else:
-                print(result.limit_type.type)
-
-        return HttpResponse(expected_performance)
-
-
-def one_mile_test(request):
+def one_mile_test_rating(gender, age, performance):
     p = (
         OneMileTestPerformance.objects.select_related(
             "test_name", "gender", "limit_type", "rating"
         )
         .filter(
-            gender__gender="Male",
+            gender__gender=gender,
             min_age__lte=Case(
-                When(min_age__isnull=True, then=60),
+                When(min_age__isnull=True, then=age),
                 default="min_age",
                 output_field=PositiveIntegerField(),
             ),
             max_age__gte=Case(
-                When(max_age__isnull=True, then=60),
+                When(max_age__isnull=True, then=age),
                 default="max_age",
                 output_field=PositiveIntegerField(),
             ),
             limit_type__type=Case(
-                When(performance__lt=33.5, then=Value("above")),
-                When(performance__gt=33.5, then=Value("below")),
+                When(performance__lt=performance, then=Value("above")),
+                When(performance__gt=performance, then=Value("below")),
                 default=Value("from"),
                 output_field=CharField(max_length=5),
             ),
@@ -212,8 +203,16 @@ def one_mile_test(request):
         .order_by("-performance")
         .first()
     )
-    y = PerformanceRatingScoring.objects.filter(
+    score = PerformanceRatingScoring.objects.filter(
         rating__iexact=p.rating, test_name__test_name__icontains="mile"
-    ).values_list("score", flat=True)
-    print(y)
-    return HttpResponse(y)
+    ).first()
+
+    result = {"user_performance": p.performance, "user_score": score.score, "rating": score.rating}
+    return result
+
+
+def record_test_score(customer, test_name, rating, score, test_date):
+    print('test_date: ', test_date)
+    test_record = TestPerformance.objects.create(
+        customer=customer, test_name=test_name, rating=rating, score=score, test_date=test_date
+    )

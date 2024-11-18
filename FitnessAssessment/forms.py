@@ -24,6 +24,8 @@ class ChestPressForm(forms.ModelForm):
     performance = forms.DecimalField(
         max_digits=5, decimal_places=2, label="Repetion Maximum (In Pounds)"
     )
+    test_id = forms.ModelChoiceField(queryset=FitnessTest.objects.all())
+    test_id.widget = test_id.hidden_widget()
 
     class Meta:
         model = PerformanceInput
@@ -34,6 +36,8 @@ class WaistHipRatioForm(forms.ModelForm):
     performance = forms.DecimalField(
         max_digits=5, decimal_places=2, label="Waist Hip Ratio"
     )
+    test_id = forms.ModelChoiceField(queryset=FitnessTest.objects.all())
+    test_id.widget = test_id.hidden_widget()
 
     class Meta:
         model = PerformanceInput
