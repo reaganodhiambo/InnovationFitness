@@ -103,7 +103,6 @@ def updatePerformance(request):
 def oneMileTest(request):
     test_name = FitnessTest.objects.filter(test_name__icontains="mile")[0]
     if request.method == "POST":
-        # customer = Customer.objects.get(id=customer_id)
         form = OneMileTestForm(request.POST)
         if form.is_valid():
             customer = form.cleaned_data["customer"]
@@ -141,7 +140,7 @@ def oneMileTest(request):
                 test_name=test_name,
                 rating=scoring["rating"],
                 score=scoring["user_score"],
-                test_date=datetime.date(2024,10,15)
+                test_date=datetime.date.today()
             )
             if created:
                 return HttpResponse("Test Input Saved")
