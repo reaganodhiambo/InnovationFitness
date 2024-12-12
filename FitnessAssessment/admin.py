@@ -35,6 +35,7 @@ class OneMileTestPerformanceAdmin(admin.ModelAdmin):
         "performance",
         "rating",
     )
+    list_filter = ("gender","min_age", "max_age")
 
 
 class MaximumChestPressPerformanceAdmin(admin.ModelAdmin):

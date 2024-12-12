@@ -277,8 +277,8 @@ class TestPerformance(models.Model):
     test_date = models.DateField()
     customer = models.ForeignKey(Customer, on_delete=models.DO_NOTHING)
     test_name = models.ForeignKey(FitnessTest, on_delete=models.DO_NOTHING)
-    rating = models.CharField(max_length=50)
-    score = models.DecimalField(max_digits=5, decimal_places=2)
+    rating = models.CharField(max_length=50,null=True)
+    score = models.DecimalField(max_digits=5, decimal_places=2,null=True)
 
     class Meta:
         unique_together = ("customer", "test_name", "test_date")
@@ -290,7 +290,7 @@ class TestPerformance(models.Model):
 class PerformanceInput(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.DO_NOTHING)
     test_id = models.ForeignKey(FitnessTest, on_delete=models.DO_NOTHING)
-    test_date = models.DateTimeField()
+    test_date = models.DateTimeField(auto_now=True)
     performance = models.DecimalField(max_digits=5,decimal_places=2)
 
     def __str__(self):
