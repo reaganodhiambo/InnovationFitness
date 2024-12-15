@@ -2,6 +2,5 @@
 <form method="post">    
     {% csrf_token %}
     {{form.as_p}}
-    <p hidden> {{form.test_id}} </p>
-    <button type="submit">Add</button>
+    <button type="submit">Add {{test.test_name}}</button>
 </form>

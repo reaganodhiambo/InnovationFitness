@@ -1,4 +1,4 @@
 <h1>Fitness Tests</h1>
-{% for test in tests %}
-<li><a href="{% url 'chest_press'%}">{{ test.test_name }}</a></li>
+{% for key, value in test_urls.items %}
+<li><a href="{% url value %}">{{ key }}</a></li>
 {% endfor %}

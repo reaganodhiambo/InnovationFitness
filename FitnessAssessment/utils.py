@@ -17,5 +17,4 @@ def calculate_max_chest_press(weight, repetition_maximum):
     max_chest_press = repetition_maximum / weight_in_pounds
     return max_chest_press
 
-print(calculate_one_mile_test(20,43,"female",23,70))
 

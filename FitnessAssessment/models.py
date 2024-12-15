@@ -31,7 +31,7 @@ class TestInput(models.Model):
     muscle_mass = models.PositiveIntegerField(null=True)
     height_in_cm = models.PositiveIntegerField(null=True)
     weight_in_kg = models.PositiveIntegerField(null=True)
-    bone_mass = models.PositiveIntegerField(null=True)
+    bone_mass = models.DecimalField(decimal_places=2, max_digits=3, null=True)
     metabolic_age = models.PositiveIntegerField(null=True)
     bmi = models.PositiveIntegerField(null=True)
     visceral_fat_rating = models.PositiveIntegerField(null=True)
@@ -41,7 +41,7 @@ class TestInput(models.Model):
     no_of_situps = models.PositiveIntegerField(null=True)
     no_of_push_ups = models.PositiveIntegerField(null=True)
     sit_and_reach = models.DecimalField(decimal_places=2, max_digits=4, null=True)
-    test_date = models.DateField(auto_now_add=True)
+    test_date = models.DateField()
 
     class Meta:
         unique_together = ("customer", "test_date")
@@ -252,6 +252,17 @@ class VisceralFatRatingTestPerformance(models.Model):
         return str(self.test_name)
 
 
+class BoneMassWeightBucketing(models.Model):
+    gender = models.ForeignKey(Gender, on_delete=models.CASCADE)
+    min_weight = models.PositiveIntegerField(blank=True, null=True)
+    max_weight = models.PositiveIntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return (
+            str(self.gender) + ": " + str(self.min_weight) + " - " + str(self.max_weight)
+        )
+
+
 class BoneMassTestPerformance(models.Model):
     weight_bucket_choices = (
         ("Below 65", "Below 65"),
@@ -267,6 +278,53 @@ class BoneMassTestPerformance(models.Model):
     weight_bucket = models.CharField(max_length=15, choices=weight_bucket_choices)
     limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
     performance = models.DecimalField(max_digits=3, decimal_places=2)
+    rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return str(self.test_name)
+
+
+class AgeLimit(models.Model):
+    test_name = models.ForeignKey(FitnessTest, on_delete=models.CASCADE)
+    age_limit = models.PositiveIntegerField(blank=True, null=True)
+    limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return (
+            str(self.test_name)
+            + ": "
+            + str(self.limit_type)
+            + ": "
+            + str(self.age_limit)
+        )
+
+
+class WeightLimit(models.Model):
+    test_name = models.ForeignKey(FitnessTest, on_delete=models.CASCADE)
+    gender = models.ForeignKey(Gender, on_delete=models.PROTECT)
+    weight_limit = models.PositiveIntegerField(blank=True, null=True)
+    limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = ("test_name", "gender", "weight_limit", "limit_type")
+
+    def __str__(self):
+        return (
+            str(self.test_name)
+            + ": "
+            + str(self.gender)
+            + ": "
+            + str(self.limit_type)
+            + ": "
+            + str(self.weight_limit)
+        )
+
+
+class BoneMassTestPerformance2(models.Model):
+    test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
+    weight_limit = models.ForeignKey(WeightLimit, on_delete=models.PROTECT)
+    performance = models.DecimalField(max_digits=3, decimal_places=2)
+    performance_limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
     rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
 
     def __str__(self):
