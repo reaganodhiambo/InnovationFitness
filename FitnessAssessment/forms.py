@@ -74,4 +74,4 @@ class BoneMassForm(forms.ModelForm):
 
     class Meta:
         model = TestInput
-        fields = ["customer", "weight", "bone_mass"]
+        fields = ["customer", "weight_in_kg", "bone_mass"]

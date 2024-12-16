@@ -1,4 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{% url 'register_customer' %}">Register Customer</a>
 <h1>Fitness Tests</h1>
 {% for key, value in test_urls.items %}
+
 <li><a href="{% url value %}">{{ key }}</a></li>
 {% endfor %}
+{% endblock content %}

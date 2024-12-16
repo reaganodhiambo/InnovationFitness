@@ -140,7 +140,6 @@ def age_gender_performance_rating(gender, age, performance, test_model):
         .order_by("-performance")
         .first()
     )
-    print("**********printing one mile test rating p*********  ", p)
     score = PerformanceRatingScoring.objects.filter(
         rating__iexact=p.rating, test_name__test_name__iexact=p.test_name
     ).first()
@@ -499,20 +498,20 @@ def bodyFatTest(request):
 
     return render(request, "test_input.html", context=context)
 
-
+"""Bone Mass"""
 def boneMassTest(request):
-    test_model = BoneMassTestPerformance2.objects.all()[0]
+    test_model = BoneMassTestPerformance.objects.all()[0]
     if request.method == "POST":
         form = BoneMassForm(request.POST)
         if form.is_valid():
             customer = form.cleaned_data["customer"]
             bone_mass = form.cleaned_data["bone_mass"]
-            weight = form.cleaned_data["weight"]
+            weight = form.cleaned_data["weight_in_kg"]
 
             scoring = performance_rating_lookup(
                 gender=customer.gender,
                 weight=weight,
-                test_model=BoneMassTestPerformance2,
+                test_model=BoneMassTestPerformance,
                 performance=bone_mass,
             )
 
@@ -520,8 +519,9 @@ def boneMassTest(request):
                 customer.id, datetime.date.today()
             )
             test_input_instance.bone_mass = bone_mass
+            test_input_instance.weight_in_kg = weight
 
-            test_input_instance.save(update_fields=["bone_mass"])
+            test_input_instance.save(update_fields=["bone_mass", "weight_in_kg"])
 
             record_test_score(
                 customer=customer,
@@ -616,26 +616,27 @@ def limit_type_performance_rating(performance, test_model):
 
 
 def performance_rating_lookup(gender, weight, performance, test_model):
+    print("gender, weight, performance: ", gender, weight, performance)
     p = (
         test_model.objects.select_related(
             "test_name", "performance_limit_type", "rating"
         )
         .filter(
             weight_limit__gender__gender=gender,
-            weight_limit=Case(
+            weight_limit__limit_type__type=Case(
                 When(
-                    Q(weight_limit__limit_type__iexact="above")
-                    & Q(weight_limit__lte=weight),
+                    Q(weight_limit__limit_type__type__iexact="above")
+                    & Q(weight_limit__weight_limit__lt=weight),
                     then=Value("above"),
                 ),
                 When(
-                    Q(weight_limit__limit_type__iexact="from")
-                    & Q(weight_limit__lte=weight),
+                    Q(weight_limit__limit_type__type__iexact="from")
+                    & Q(weight_limit__weight_limit__lte=weight),
                     then=Value("from"),
                 ),
                 When(
-                    Q(weight_limit__limit_type__iexact="below")
-                    & Q(pweight_limit__gt=weight),
+                    Q(weight_limit__limit_type__type__iexact="below")
+                    & Q(weight_limit__weight_limit__gt=weight),
                     then=Value("below"),
                 ),
                 default=Value("Not Found"),
@@ -644,7 +645,7 @@ def performance_rating_lookup(gender, weight, performance, test_model):
             performance_limit_type__type=Case(
                 When(
                     Q(performance_limit_type__type__iexact="above")
-                    & Q(performance__lte=performance),
+                    & Q(performance__lt=performance),
                     then=Value("above"),
                 ),
                 When(
@@ -661,10 +662,10 @@ def performance_rating_lookup(gender, weight, performance, test_model):
                 output_field=CharField(max_length=5),
             ),
         )
-        .order_by("-performance")
+        .order_by("-weight_limit", "-performance")
         .first()
     )
-    print("**********printing bone mass rating p*********  ", p)
+
     score = PerformanceRatingScoring.objects.filter(
         rating__iexact=p.rating, test_name__test_name__iexact=p.test_name
     ).first()

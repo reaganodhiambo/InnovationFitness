@@ -3,6 +3,7 @@ from django.db.models import When, Case, Value
 from django.db.models.functions import Concat, Cast
 from datetime import datetime
 
+
 class Customer(models.Model):
     gender = [
         ("Male", "Male"),
@@ -35,9 +36,9 @@ class TestInput(models.Model):
     metabolic_age = models.PositiveIntegerField(null=True)
     bmi = models.PositiveIntegerField(null=True)
     visceral_fat_rating = models.PositiveIntegerField(null=True)
-    one_mile_time = models.DecimalField(decimal_places=2, max_digits=4,null=True)
-    exercise_heart_rate = models.DecimalField(decimal_places=2, max_digits=4,null=True)
-    repetition_maximum = models.DecimalField(decimal_places=2, max_digits=4,null=True)
+    one_mile_time = models.DecimalField(decimal_places=2, max_digits=4, null=True)
+    exercise_heart_rate = models.DecimalField(decimal_places=2, max_digits=4, null=True)
+    repetition_maximum = models.DecimalField(decimal_places=2, max_digits=4, null=True)
     no_of_situps = models.PositiveIntegerField(null=True)
     no_of_push_ups = models.PositiveIntegerField(null=True)
     sit_and_reach = models.DecimalField(decimal_places=2, max_digits=4, null=True)
@@ -259,29 +260,12 @@ class BoneMassWeightBucketing(models.Model):
 
     def __str__(self):
         return (
-            str(self.gender) + ": " + str(self.min_weight) + " - " + str(self.max_weight)
+            str(self.gender)
+            + ": "
+            + str(self.min_weight)
+            + " - "
+            + str(self.max_weight)
         )
-
-
-class BoneMassTestPerformance(models.Model):
-    weight_bucket_choices = (
-        ("Below 65", "Below 65"),
-        ("65-95", "65-95"),
-        ("Above 95", "Above 95"),
-        ("Below 50", "Below 50"),
-        ("50-70", "50-70"),
-        ("Above 70", "Above 70"),
-    )
-
-    test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
-    gender = models.ForeignKey(Gender, on_delete=models.PROTECT)
-    weight_bucket = models.CharField(max_length=15, choices=weight_bucket_choices)
-    limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
-    performance = models.DecimalField(max_digits=3, decimal_places=2)
-    rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return str(self.test_name)
 
 
 class AgeLimit(models.Model):
@@ -320,11 +304,13 @@ class WeightLimit(models.Model):
         )
 
 
-class BoneMassTestPerformance2(models.Model):
+class BoneMassTestPerformance(models.Model):
     test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
     weight_limit = models.ForeignKey(WeightLimit, on_delete=models.PROTECT)
     performance = models.DecimalField(max_digits=3, decimal_places=2)
-    performance_limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
+    performance_limit_type = models.ForeignKey(
+        PerformanceLimit, on_delete=models.PROTECT
+    )
     rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
 
     def __str__(self):
@@ -335,8 +321,8 @@ class TestPerformance(models.Model):
     test_date = models.DateField()
     customer = models.ForeignKey(Customer, on_delete=models.DO_NOTHING)
     test_name = models.ForeignKey(FitnessTest, on_delete=models.DO_NOTHING)
-    rating = models.CharField(max_length=50,null=True)
-    score = models.DecimalField(max_digits=5, decimal_places=2,null=True)
+    rating = models.CharField(max_length=50, null=True)
+    score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
 
     class Meta:
         unique_together = ("customer", "test_name", "test_date")
@@ -349,7 +335,7 @@ class PerformanceInput(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.DO_NOTHING)
     test_id = models.ForeignKey(FitnessTest, on_delete=models.DO_NOTHING)
     test_date = models.DateTimeField(auto_now=True)
-    performance = models.DecimalField(max_digits=5,decimal_places=2)
+    performance = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
         return str(self.customer)
