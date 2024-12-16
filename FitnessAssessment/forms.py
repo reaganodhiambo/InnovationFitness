@@ -1,11 +1,24 @@
 from django import forms
 from .models import *
-
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
         fields = "__all__"
+
+
+class UserRegistrationForm(UserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].help_text = None
+        self.fields["password1"].help_text = None
+        self.fields["password2"].help_text = None
+
+    class Meta:
+        model = User
+        fields = ["username"]
 
 
 class OneMileTestForm(forms.ModelForm):

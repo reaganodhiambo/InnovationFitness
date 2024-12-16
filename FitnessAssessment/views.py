@@ -5,10 +5,16 @@ from .utils import calculate_one_mile_test, calculate_max_chest_press
 from django.db import connection
 from django.db.models import Case, When, PositiveIntegerField, CharField, Value, Max, Q
 import datetime
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 
 # Create your views here.
+@login_required(login_url="login")
 def index(request):
+    user = request.user
     test_urls = {
         "The One Mile Test": "onemiletest",
         "Maximum Chest Press Test": "chest_press",
@@ -24,8 +30,47 @@ def index(request):
 
     # tests = FitnessTest.objects.all()
     # context = {"tests": tests}
-    context = {"test_urls": test_urls}
+    context = {"test_urls": test_urls,"user":user}
     return render(request, "home.html", context=context)
+
+
+def registerUser(request):
+    if request.method == "POST":
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("login")
+    else:
+        form = UserRegistrationForm()
+    context = {
+        "form": form,
+    }
+    return render(request, "register.html", context=context)
+
+
+def loginUser(request):
+    if request.method == "POST":
+        form = AuthenticationForm()
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("home")
+        else:
+            return HttpResponse("Invalid username or password")
+    else:
+        form = AuthenticationForm()
+
+    context = {
+        "form": form,
+    }
+    return render(request, "login.html", context=context)
+
+
+def logoutUser(request):
+    logout(request)
+    return redirect("home")
 
 
 def registerCustomer(request):
@@ -195,7 +240,7 @@ def chestPress(request):
                 score=scoring["user_score"],
                 test_date=datetime.date.today(),
             )
-            return HttpResponse("Form Saved Successfully")
+            return redirect("home")
     else:
         form = ChestPressForm()
     context = {"form": form, "test_name": test_model.test_name}
@@ -238,7 +283,7 @@ def situpTest(request):
                 score=scoring["user_score"],
                 test_date=datetime.date.today(),
             )
-            return HttpResponse("Form Saved Successfully")
+            return redirect("home")
     else:
         form = SitupForm()
     context = {"form": form, "test_name": test_model.test_name}
@@ -281,7 +326,7 @@ def pushupTest(request):
                 score=scoring["user_score"],
                 test_date=datetime.date.today(),
             )
-            return HttpResponse("Form Saved Successfully")
+            return redirect("home")
     else:
         form = PushupForm()
     context = {"form": form, "test_name": test_model.test_name}
@@ -324,7 +369,7 @@ def sitAndReachTest(request):
                 score=scoring["user_score"],
                 test_date=datetime.date.today(),
             )
-            return HttpResponse("Form Saved Successfully")
+            return redirect("home")
     else:
         form = SitAndReachForm()
     context = {"form": form, "test_name": test_model.test_name}
@@ -370,7 +415,7 @@ def waistHipRatioTest(request):
                 score=scoring["user_score"],
                 test_date=datetime.date.today(),
             )
-            return HttpResponse("Form Saved Successfully")
+            return redirect("home")
     else:
         form = WaistHipRatioForm()
     context = {"form": form, "test_name": test_model.test_name}
@@ -491,14 +536,17 @@ def bodyFatTest(request):
                 score=scoring["user_score"],
                 test_date=datetime.date.today(),
             )
-            return HttpResponse("Form Saved Successfully")
+            return redirect("home")
     else:
         form = BodyFatForm()
     context = {"form": form, "test_name": test_model.test_name}
 
     return render(request, "test_input.html", context=context)
 
+
 """Bone Mass"""
+
+
 def boneMassTest(request):
     test_model = BoneMassTestPerformance.objects.all()[0]
     if request.method == "POST":

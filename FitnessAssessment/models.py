@@ -2,18 +2,20 @@ from django.db import models
 from django.db.models import When, Case, Value
 from django.db.models.functions import Concat, Cast
 from datetime import datetime
-
+from django.contrib.auth.models import User
 
 class Customer(models.Model):
     gender = [
         ("Male", "Male"),
         ("Female", "Female"),
     ]
+    # user = models.OneToOneField(User,on_delete=models.PROTECT)
+    # phone_number = models.CharField(max_length=256, blank=False,null=True)
+    age = models.PositiveIntegerField(blank=False)
+    gender = models.CharField(max_length=10, choices=gender)
     first_name = models.CharField(max_length=256, blank=False)
     last_name = models.CharField(max_length=256, blank=False)
     email = models.EmailField(max_length=256, blank=False)
-    age = models.PositiveIntegerField(blank=False)
-    gender = models.CharField(max_length=10, choices=gender)
     date_created = models.DateField(auto_now_add=True, blank=False)
 
     class Meta:
