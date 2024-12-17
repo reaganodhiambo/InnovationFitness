@@ -16,7 +16,7 @@ class UserProfile(models.Model):
 
 
     class Meta:
-        verbose_name = "User Profle"
+        verbose_name = "User Profile"
         verbose_name_plural = "User Profiles"
 
     def __str__(self):
