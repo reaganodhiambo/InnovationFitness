@@ -4,30 +4,27 @@ from django.db.models.functions import Concat, Cast
 from datetime import datetime
 from django.contrib.auth.models import User
 
-class Customer(models.Model):
+class UserProfile(models.Model):
+    user = models.OneToOneField(User,on_delete=models.PROTECT)
     gender = [
         ("Male", "Male"),
         ("Female", "Female"),
     ]
-    # user = models.OneToOneField(User,on_delete=models.PROTECT)
-    # phone_number = models.CharField(max_length=256, blank=False,null=True)
+    phone_number = models.CharField(max_length=256, blank=False,null=True)
     age = models.PositiveIntegerField(blank=False)
     gender = models.CharField(max_length=10, choices=gender)
-    first_name = models.CharField(max_length=256, blank=False)
-    last_name = models.CharField(max_length=256, blank=False)
-    email = models.EmailField(max_length=256, blank=False)
-    date_created = models.DateField(auto_now_add=True, blank=False)
+
 
     class Meta:
-        verbose_name = "Customer"
-        verbose_name_plural = "Customers"
+        verbose_name = "User Profle"
+        verbose_name_plural = "User Profiles"
 
     def __str__(self):
-        return self.first_name
+        return self.user.username
 
 
 class TestInput(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     percentage_body_fat = models.PositiveIntegerField(null=True)
     waist_measurement = models.PositiveIntegerField(null=True)
     hip_measurement = models.PositiveIntegerField(null=True)
@@ -321,7 +318,7 @@ class BoneMassTestPerformance(models.Model):
 
 class TestPerformance(models.Model):
     test_date = models.DateField()
-    customer = models.ForeignKey(Customer, on_delete=models.DO_NOTHING)
+    customer = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
     test_name = models.ForeignKey(FitnessTest, on_delete=models.DO_NOTHING)
     rating = models.CharField(max_length=50, null=True)
     score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
@@ -334,7 +331,7 @@ class TestPerformance(models.Model):
 
 
 class PerformanceInput(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.DO_NOTHING)
+    customer = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
     test_id = models.ForeignKey(FitnessTest, on_delete=models.DO_NOTHING)
     test_date = models.DateTimeField(auto_now=True)
     performance = models.DecimalField(max_digits=5, decimal_places=2)

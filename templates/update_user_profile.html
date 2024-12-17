@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Add User</h1>
+<h1>Update Profile</h1>
+<p>Hello {{user.username}} </p>
 <form method="post">
     {% csrf_token %}
+    
     {{form.as_p}}
     <button type="submit">Register</button>
 </form>
 {% endblock %}
+

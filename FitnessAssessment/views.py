@@ -28,9 +28,7 @@ def index(request):
         "Bone Mass": "bonemass",
     }
 
-    # tests = FitnessTest.objects.all()
-    # context = {"tests": tests}
-    context = {"test_urls": test_urls,"user":user}
+    context = {"test_urls": test_urls, "user": user}
     return render(request, "home.html", context=context)
 
 
@@ -38,8 +36,8 @@ def registerUser(request):
     if request.method == "POST":
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect("login")
+            user = form.save()
+            return redirect("update_user_profile", user.id)
     else:
         form = UserRegistrationForm()
     context = {
@@ -73,21 +71,23 @@ def logoutUser(request):
     return redirect("home")
 
 
-def registerCustomer(request):
-    if request.method == "POST":
-        form = CustomerForm(request.POST)
-        if form.is_valid():
-            customer_id = form.cleaned_data.get("id")
-            form.save()
-            HttpResponse("Customer Registered")
-            return redirect("onemiletest")
-
+def updateUserProfile(request, id):
+    user = User.objects.get(id=id)
+    if request.user.id == user.id:
+        if request.method == "POST":
+            form = UserProfileForm(request.POST)
+            if form.is_valid():
+                updated_form = form.save(commit=False)
+                updated_form.user_id = user.id
+                updated_form.save()
+                return redirect("home")
         else:
-            return HttpResponse("Invalid Form")
+            form = UserProfileForm()
     else:
-        form = CustomerForm()
-    context = {"form": form}
-    return render(request, "register_customer.html", context=context)
+        return HttpResponse("You are not authorized to update this user's profile")
+        
+    context = {"form": form, "user": user}
+    return render(request, "update_user_profile.html", context=context)
 
 
 """One Mile Test"""

@@ -4,16 +4,15 @@ from .models import *
 # Register your models here.
 
 
-class CustomerAdmin(admin.ModelAdmin):
+class UserProfileAdmin(admin.ModelAdmin):
     list_display = (
-        "first_name",
-        "last_name",
+        
         "gender",
         "age",
     )
-
-    search_fields = ("first_name", "last_name")
-    ordering = ("first_name", "last_name")
+    readonly_fields = ("user",)
+    search_fields = ("user",)
+    ordering = ("user",)
 
 
 class FitnessTestAdmin(admin.ModelAdmin):
@@ -118,7 +117,7 @@ class BoneMassWeightBucketingAdmin(admin.ModelAdmin):
     list_filter = ("gender", "min_weight")
 
 
-admin.site.register(Customer, CustomerAdmin)
+admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(TestInput)
 admin.site.register(Gender)
 admin.site.register(Category)
