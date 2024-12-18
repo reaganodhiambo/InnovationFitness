@@ -37,7 +37,8 @@ def registerUser(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            return redirect("update_user_profile", user.id)
+            login(request, user)
+            return redirect("login")
     else:
         form = UserRegistrationForm()
     context = {
@@ -54,7 +55,15 @@ def loginUser(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("home")
+            try:
+                user_profile = UserProfile.objects.get(user_id=user.id)
+            except:
+                user_profile = None
+
+            if not user_profile:
+                return redirect("update_user_profile", user.id)
+            else:
+                return redirect("home")
         else:
             return HttpResponse("Invalid username or password")
     else:
@@ -66,33 +75,50 @@ def loginUser(request):
     return render(request, "login.html", context=context)
 
 
+@login_required(login_url="login")
 def logoutUser(request):
     logout(request)
     return redirect("home")
 
 
+@login_required(login_url="login")
 def updateUserProfile(request, id):
     user = User.objects.get(id=id)
+
     if request.user.id == user.id:
+        try:
+            user_profile = UserProfile.objects.get(user_id=id)
+            initial = user_profile
+        except:
+            user_profile = None
+
+        initial = user_profile
+        
         if request.method == "POST":
-            form = UserProfileForm(request.POST)
+            form = UserProfileForm(
+                request.POST,
+                instance=initial,
+            )
+
             if form.is_valid():
                 updated_form = form.save(commit=False)
                 updated_form.user_id = user.id
+                print("updated_form: ", updated_form)
                 updated_form.save()
                 return redirect("home")
         else:
-            form = UserProfileForm()
+            form = UserProfileForm(instance=initial)
     else:
         return HttpResponse("You are not authorized to update this user's profile")
-        
-    context = {"form": form, "user": user}
+
+    context = {"form": form, "user": user, "user_profile": user_profile}
     return render(request, "update_user_profile.html", context=context)
 
 
 """One Mile Test"""
 
 
+@login_required(login_url="login")
 def oneMileTest(request):
     test_model = OneMileTestPerformance.objects.all()[0]
     if request.method == "POST":
@@ -147,6 +173,7 @@ def oneMileTest(request):
     return render(request, "test_input.html", context=context)
 
 
+@login_required(login_url="login")
 def age_gender_performance_rating(gender, age, performance, test_model):
     p = (
         test_model.objects.select_related("test_name", "gender", "limit_type", "rating")
@@ -200,6 +227,7 @@ def age_gender_performance_rating(gender, age, performance, test_model):
 """Max Chest Press"""
 
 
+@login_required(login_url="login")
 def chestPress(request):
 
     test_model = MaximumChestPressPerformance.objects.all()[0]
@@ -250,6 +278,7 @@ def chestPress(request):
 """60 Sec sit up test"""
 
 
+@login_required(login_url="login")
 def situpTest(request):
     test_model = SixtySecSitUpTestPerformance.objects.all()[0]
     if request.method == "POST":
@@ -293,6 +322,7 @@ def situpTest(request):
 """Push Up test"""
 
 
+@login_required(login_url="login")
 def pushupTest(request):
     test_model = ThePushUpTestPerformance.objects.all()[0]
     if request.method == "POST":
@@ -336,6 +366,7 @@ def pushupTest(request):
 """sit and reach test"""
 
 
+@login_required(login_url="login")
 def sitAndReachTest(request):
     test_model = SitAndReachTestPerformance.objects.all()[0]
     if request.method == "POST":
@@ -379,6 +410,7 @@ def sitAndReachTest(request):
 """Waist Hip ratio"""
 
 
+@login_required(login_url="login")
 def waistHipRatioTest(request):
     test_model = WaistHipRatioTestPerformance.objects.all()[0]
     if request.method == "POST":
@@ -426,6 +458,7 @@ def waistHipRatioTest(request):
 """Body Mass Index(BMI)"""
 
 
+@login_required(login_url="login")
 def bmiTest(request):
     test_model = BMITestPerformance.objects.all()[0]
     if request.method == "POST":
@@ -465,6 +498,7 @@ def bmiTest(request):
     return render(request, "test_input.html", context=context)
 
 
+@login_required(login_url="login")
 def visceralFatTest(request):
     test_model = VisceralFatRatingTestPerformance.objects.all()[0]
     if request.method == "POST":
@@ -503,6 +537,7 @@ def visceralFatTest(request):
 """Body Fat"""
 
 
+@login_required(login_url="login")
 def bodyFatTest(request):
     test_model = BodyFatTestPerformance.objects.all()[0]
     if request.method == "POST":
@@ -547,6 +582,7 @@ def bodyFatTest(request):
 """Bone Mass"""
 
 
+@login_required(login_url="login")
 def boneMassTest(request):
     test_model = BoneMassTestPerformance.objects.all()[0]
     if request.method == "POST":

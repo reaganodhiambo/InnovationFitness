@@ -6,7 +6,12 @@
     {% csrf_token %}
     
     {{form.as_p}}
-    <button type="submit">Register</button>
+    <button type="submit">Save Changes</button>   
 </form>
+{% if not user_profile %}
+        <a href="{% url "logout" %}">Logout</a>
+    {% else %}
+    <button onclick="window.history.back()">Cancel</button>
+    {% endif %}
 {% endblock %}
 

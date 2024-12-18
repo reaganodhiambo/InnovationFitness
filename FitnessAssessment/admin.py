@@ -6,7 +6,7 @@ from .models import *
 
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = (
-        
+        "user",
         "gender",
         "age",
     )

@@ -2,7 +2,8 @@
 {% block content %}
 {% if user.is_authenticated %}
   <p>Hello {{user.username}} </p>
-<a href="{% url 'update_user_profile' user.id %}">Update User Profile</a>
+<a href="{% url 'update_user_profile' user.id %}">Update User Profile</a><br>
+<a href="{% url 'logout' %}">Logout</a>
 {% endif %}
 <h2>Fitness Tests</h2>
 {% for key, value in test_urls.items %}
@@ -10,5 +11,6 @@
 <li style="list-style-type: circle;"><a href="{% url value %}" style=" text-decoration:underline;">{{ key }}</a></li>
 {% endfor %}
 
-<a href="{% url 'logout' %}">Logout</a>
+
+
 {% endblock content %}

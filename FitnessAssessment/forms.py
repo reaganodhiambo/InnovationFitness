@@ -3,8 +3,10 @@ from .models import *
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
+
 class UserProfileForm(forms.ModelForm):
     user = forms.CharField(widget=forms.HiddenInput(), required=False)
+
     class Meta:
         model = UserProfile
         fields = "__all__"
@@ -19,7 +21,7 @@ class UserRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ["username","first_name","last_name","email"]
+        fields = ["username", "first_name", "last_name", "email"]
 
 
 class OneMileTestForm(forms.ModelForm):
