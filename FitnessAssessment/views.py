@@ -121,15 +121,9 @@ def updateUserProfile(request, id):
 @login_required(login_url="login")
 def oneMileTest(request):
     test_model = OneMileTestPerformance.objects.all()[0]
-
-    print("OneMileTestFor Before POST********: ", OneMileTestForm)
-
     if request.method == "POST":
         form = OneMileTestForm(request.POST)
-        print("OneMileTestForm POST********: ", form.data["customer"])
-        # print("form*****:", form)
         if form.is_valid():
-            print("form is valid******:", "turu")
             if request.user.id != form.cleaned_data["customer"].user.id:
                 messages.error(
                     request,
@@ -141,7 +135,7 @@ def oneMileTest(request):
             weight = form.cleaned_data["weight_in_kg"]
             exercise_heart_rate = form.cleaned_data["exercise_heart_rate"]
             one_mile_time = form.cleaned_data["one_mile_time"]
-            print("*******Before getting performance******")
+
             performance = calculate_one_mile_test(
                 weight=weight,
                 age=customer.age,
@@ -149,15 +143,13 @@ def oneMileTest(request):
                 time=one_mile_time,
                 heart_rate=exercise_heart_rate,
             )
-            print(" performance", performance)
+
             scoring = age_gender_performance_rating(
                 gender=customer.gender,
                 age=customer.age,
                 performance=performance,
                 test_model=OneMileTestPerformance,
             )
-            print("performance: ", performance)
-            print(scoring)
 
             test_input_instance = get_test_input_instance(
                 customer.id, datetime.date.today()
@@ -182,21 +174,13 @@ def oneMileTest(request):
 
     else:
         user_profile = UserProfile.objects.get(user=request.user.id)
-        print("user_profile:", user_profile, user_profile.user, user_profile.user.id, user_profile.id)
-
-        customer = UserProfile(
-            user=user_profile.user,
-            gender=user_profile.gender,
-            phone_number=user_profile.phone_number,
-        )
-        print("customer:", customer, customer.user.id, customer.gender, customer.id)
-
         initial_dict = {
             "customer": user_profile,
+            "weight_in_kg": None,
+            "one_mile_time": None,
+            "exercise_heart_rate": None,
         }
-
-        form = OneMileTestForm(request.POST or None, initial=initial_dict)
-        # form = OneMileTestForm()
+        form = OneMileTestForm(initial=initial_dict)
     context = {"form": form, "test_name": test_model.test_name}
     return render(request, "test_input.html", context=context)
 
@@ -256,10 +240,7 @@ def age_gender_performance_rating(gender, age, performance, test_model):
 
 @login_required(login_url="login")
 def chestPress(request):
-
     test_model = MaximumChestPressPerformance.objects.all()[0]
-    print("MaximumChestPressPerformance name: ", test_model.test_name)
-
     if request.method == "POST":
         form = ChestPressForm(request.POST)
         if form.is_valid():
@@ -269,6 +250,7 @@ def chestPress(request):
                     "You are not authorized to update this customer's  test data",
                 )
                 return redirect(request.path_info)
+
             customer = form.cleaned_data["customer"]
             weight = form.cleaned_data["weight_in_kg"]
             repetition_maximum = form.cleaned_data["weight_in_kg"]
@@ -282,7 +264,6 @@ def chestPress(request):
                 performance=performance,
                 test_model=MaximumChestPressPerformance,
             )
-            print("Scoring: ", scoring)
 
             test_input_instance = get_test_input_instance(
                 customer.id, datetime.date.today()
@@ -303,7 +284,13 @@ def chestPress(request):
             )
             return redirect("home")
     else:
-        form = ChestPressForm()
+        user_profile = UserProfile.objects.get(user=request.user.id)
+        initial_dict = {
+            "customer": user_profile,
+            "weight_in_kg": None,
+            "repetition_maximum": None,
+        }
+        form = ChestPressForm(initial=initial_dict)
     context = {"form": form, "test_name": test_model.test_name}
     return render(request, "test_input.html", context=context)
 
@@ -335,7 +322,6 @@ def situpTest(request):
                 performance=performance,
                 test_model=SixtySecSitUpTestPerformance,
             )
-            print("Scoring: ", scoring)
 
             test_input_instance = get_test_input_instance(
                 customer, datetime.date.today()
@@ -353,7 +339,12 @@ def situpTest(request):
             )
             return redirect("home")
     else:
-        form = SitupForm()
+        user_profile = UserProfile.objects.get(user=request.user.id)
+        initial_dict = {
+            "customer": user_profile,
+            "no_of_situps": None,
+        }
+        form = SitupForm(initial=initial_dict)
     context = {"form": form, "test_name": test_model.test_name}
     return render(request, "test_input.html", context=context)
 
@@ -403,7 +394,12 @@ def pushupTest(request):
             )
             return redirect("home")
     else:
-        form = PushupForm()
+        user_profile = UserProfile.objects.get(user=request.user.id)
+        initial_dict = {
+            "customer": user_profile,
+            "no_of_push_ups": None,
+        }
+        form = PushupForm(initial=initial_dict)
     context = {"form": form, "test_name": test_model.test_name}
     return render(request, "test_input.html", context=context)
 
@@ -427,7 +423,6 @@ def sitAndReachTest(request):
             sit_and_reach = form.cleaned_data["sit_and_reach"]
 
             performance = sit_and_reach
-            print("Performance: ", performance)
 
             scoring = age_gender_performance_rating(
                 gender=customer.gender,
@@ -453,7 +448,12 @@ def sitAndReachTest(request):
             )
             return redirect("home")
     else:
-        form = SitAndReachForm()
+        user_profile = UserProfile.objects.get(user=request.user.id)
+        initial_dict = {
+            "customer": user_profile,
+            "sit_and_reach": None,
+        }
+        form = SitAndReachForm(initial=initial_dict)
     context = {"form": form, "test_name": test_model.test_name}
     return render(request, "test_input.html", context=context)
 
@@ -506,7 +506,13 @@ def waistHipRatioTest(request):
             )
             return redirect("home")
     else:
-        form = WaistHipRatioForm()
+        user_profile = UserProfile.objects.get(user=request.user.id)
+        initial_dict = {
+            "customer": user_profile,
+            "hip_measurement": None,
+            "waist_measurement": None,
+        }
+        form = WaistHipRatioForm(initial=initial_dict)
     context = {"form": form, "test_name": test_model.test_name}
 
     return render(request, "test_input.html", context=context)
@@ -556,7 +562,13 @@ def bmiTest(request):
             )
             return redirect("home")
     else:
-        form = BMIForm()
+        user_profile = UserProfile.objects.get(user=request.user.id)
+        initial_dict = {
+            "customer": user_profile,
+            "height_in_cm": None,
+            "weight_in_kg": None,
+        }
+        form = BMIForm(initial=initial_dict)
     context = {"form": form, "test_name": test_model.test_name}
     return render(request, "test_input.html", context=context)
 
@@ -598,7 +610,12 @@ def visceralFatTest(request):
             )
             return redirect("home")
     else:
-        form = VisceralFatForm()
+        user_profile = UserProfile.objects.get(user=request.user.id)
+        initial_dict = {
+            "customer": user_profile,
+            "visceral_fat_rating": None,
+        }
+        form = VisceralFatForm(initial=initial_dict)
     context = {"form": form, "test_name": test_model.test_name}
     return render(request, "test_input.html", context=context)
 
@@ -648,7 +665,12 @@ def bodyFatTest(request):
             )
             return redirect("home")
     else:
-        form = BodyFatForm()
+        user_profile = UserProfile.objects.get(user=request.user.id)
+        initial_dict = {
+            "customer": user_profile,
+            "percentage_body_fat": None,
+        }
+        form = BodyFatForm(initial=initial_dict)
     context = {"form": form, "test_name": test_model.test_name}
 
     return render(request, "test_input.html", context=context)
@@ -701,7 +723,13 @@ def boneMassTest(request):
             )
             return redirect("home")
     else:
-        form = BoneMassForm()
+        user_profile = UserProfile.objects.get(user=request.user.id)
+        initial_dict = {
+            "customer": user_profile,
+            "bone_mass": None,
+            "weight_in_kg": None,
+        }
+        form = BoneMassForm(initial=initial_dict)
     context = {"form": form, "test_name": test_model.test_name}
     return render(request, "test_input.html", context=context)
 
