@@ -25,6 +25,7 @@ class UserRegistrationForm(UserCreationForm):
 
 
 class OneMileTestForm(forms.ModelForm):
+    customer = forms.CharField(widget=forms.HiddenInput(), required=False)
     class Meta:
         model = TestInput
         fields = ["customer", "weight_in_kg", "one_mile_time", "exercise_heart_rate"]

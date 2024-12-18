@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib import messages
 
 
 # Create your views here.
@@ -93,7 +94,6 @@ def updateUserProfile(request, id):
             user_profile = None
 
         initial = user_profile
-        
         if request.method == "POST":
             form = UserProfileForm(
                 request.POST,
@@ -121,14 +121,27 @@ def updateUserProfile(request, id):
 @login_required(login_url="login")
 def oneMileTest(request):
     test_model = OneMileTestPerformance.objects.all()[0]
+
+    print("OneMileTestFor Before POST********: ", OneMileTestForm)
+
     if request.method == "POST":
         form = OneMileTestForm(request.POST)
+        print("OneMileTestForm POST********: ", form.data["customer"])
+        # print("form*****:", form)
         if form.is_valid():
+            print("form is valid******:", "turu")
+            if request.user.id != form.cleaned_data["customer"].user.id:
+                messages.error(
+                    request,
+                    "You are not authorized to update this customer's  test data",
+                )
+                return redirect(request.path_info)
+
             customer = form.cleaned_data["customer"]
             weight = form.cleaned_data["weight_in_kg"]
             exercise_heart_rate = form.cleaned_data["exercise_heart_rate"]
             one_mile_time = form.cleaned_data["one_mile_time"]
-
+            print("*******Before getting performance******")
             performance = calculate_one_mile_test(
                 weight=weight,
                 age=customer.age,
@@ -136,7 +149,7 @@ def oneMileTest(request):
                 time=one_mile_time,
                 heart_rate=exercise_heart_rate,
             )
-
+            print(" performance", performance)
             scoring = age_gender_performance_rating(
                 gender=customer.gender,
                 age=customer.age,
@@ -168,12 +181,26 @@ def oneMileTest(request):
             return redirect("home")
 
     else:
-        form = OneMileTestForm()
+        user_profile = UserProfile.objects.get(user=request.user.id)
+        print("user_profile:", user_profile, user_profile.user, user_profile.user.id, user_profile.id)
+
+        customer = UserProfile(
+            user=user_profile.user,
+            gender=user_profile.gender,
+            phone_number=user_profile.phone_number,
+        )
+        print("customer:", customer, customer.user.id, customer.gender, customer.id)
+
+        initial_dict = {
+            "customer": user_profile,
+        }
+
+        form = OneMileTestForm(request.POST or None, initial=initial_dict)
+        # form = OneMileTestForm()
     context = {"form": form, "test_name": test_model.test_name}
     return render(request, "test_input.html", context=context)
 
 
-@login_required(login_url="login")
 def age_gender_performance_rating(gender, age, performance, test_model):
     p = (
         test_model.objects.select_related("test_name", "gender", "limit_type", "rating")
@@ -236,6 +263,12 @@ def chestPress(request):
     if request.method == "POST":
         form = ChestPressForm(request.POST)
         if form.is_valid():
+            if request.user.id != form.cleaned_data["customer"].user.id:
+                messages.error(
+                    request,
+                    "You are not authorized to update this customer's  test data",
+                )
+                return redirect(request.path_info)
             customer = form.cleaned_data["customer"]
             weight = form.cleaned_data["weight_in_kg"]
             repetition_maximum = form.cleaned_data["weight_in_kg"]
@@ -284,6 +317,12 @@ def situpTest(request):
     if request.method == "POST":
         form = SitupForm(request.POST)
         if form.is_valid():
+            if request.user.id != form.cleaned_data["customer"].user.id:
+                messages.error(
+                    request,
+                    "You are not authorized to update this customer's  test data",
+                )
+                return redirect(request.path_info)
             customer = form.cleaned_data["customer"]
             no_of_situps = form.cleaned_data["no_of_situps"]
 
@@ -328,6 +367,12 @@ def pushupTest(request):
     if request.method == "POST":
         form = PushupForm(request.POST)
         if form.is_valid():
+            if request.user.id != form.cleaned_data["customer"].user.id:
+                messages.error(
+                    request,
+                    "You are not authorized to update this customer's  test data",
+                )
+                return redirect(request.path_info)
             customer = form.cleaned_data["customer"]
             no_of_push_ups = form.cleaned_data["no_of_push_ups"]
 
@@ -372,6 +417,12 @@ def sitAndReachTest(request):
     if request.method == "POST":
         form = SitAndReachForm(request.POST)
         if form.is_valid():
+            if request.user.id != form.cleaned_data["customer"].user.id:
+                messages.error(
+                    request,
+                    "You are not authorized to update this customer's  test data",
+                )
+                return redirect(request.path_info)
             customer = form.cleaned_data["customer"]
             sit_and_reach = form.cleaned_data["sit_and_reach"]
 
@@ -416,6 +467,12 @@ def waistHipRatioTest(request):
     if request.method == "POST":
         form = WaistHipRatioForm(request.POST)
         if form.is_valid():
+            if request.user.id != form.cleaned_data["customer"].user.id:
+                messages.error(
+                    request,
+                    "You are not authorized to update this customer's  test data",
+                )
+                return redirect(request.path_info)
             customer = form.cleaned_data["customer"]
             hip_measurement = form.cleaned_data["hip_measurement"]
             waist_measurement = form.cleaned_data["waist_measurement"]
@@ -464,6 +521,12 @@ def bmiTest(request):
     if request.method == "POST":
         form = BMIForm(request.POST)
         if form.is_valid():
+            if request.user.id != form.cleaned_data["customer"].user.id:
+                messages.error(
+                    request,
+                    "You are not authorized to update this customer's  test data",
+                )
+                return redirect(request.path_info)
             customer = form.cleaned_data["customer"]
             height_in_cm = form.cleaned_data["height_in_cm"]
             weight_in_kg = form.cleaned_data["weight_in_kg"]
@@ -504,6 +567,12 @@ def visceralFatTest(request):
     if request.method == "POST":
         form = VisceralFatForm(request.POST)
         if form.is_valid():
+            if request.user.id != form.cleaned_data["customer"].user.id:
+                messages.error(
+                    request,
+                    "You are not authorized to update this customer's  test data",
+                )
+                return redirect(request.path_info)
             customer = form.cleaned_data["customer"]
             visceral_fat_rating = form.cleaned_data["visceral_fat_rating"]
 
@@ -544,6 +613,12 @@ def bodyFatTest(request):
         form = BodyFatForm(request.POST)
 
         if form.is_valid():
+            if request.user.id != form.cleaned_data["customer"].user.id:
+                messages.error(
+                    request,
+                    "You are not authorized to update this customer's  test data",
+                )
+                return redirect(request.path_info)
             customer = form.cleaned_data["customer"]
             percentage_body_fat = form.cleaned_data["percentage_body_fat"]
 
@@ -588,6 +663,16 @@ def boneMassTest(request):
     if request.method == "POST":
         form = BoneMassForm(request.POST)
         if form.is_valid():
+            if request.user.id != form.cleaned_data["customer"].user.id:
+                messages.error(
+                    request,
+                    "You are not authorized to update this customer's  test data",
+                )
+                return redirect(request.path_info)
+            if request.user.id != form.cleaned_data["customer"].user.id:
+                return HttpResponse(
+                    "You are not authorized to update this customer's  test data"
+                )
             customer = form.cleaned_data["customer"]
             bone_mass = form.cleaned_data["bone_mass"]
             weight = form.cleaned_data["weight_in_kg"]

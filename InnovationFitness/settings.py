@@ -54,6 +54,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'InnovationFitness.urls'
+AUTH_PROFILE_MODULE = "FitnessAssessment.UserProfile"
+
 
 TEMPLATES = [
     {
