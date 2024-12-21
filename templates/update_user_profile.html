@@ -1,17 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
+{% load bootstrap5 %}
 <h1>Update Profile</h1>
 <p>Hello {{user.username}} </p>
+
 <form method="post">
     {% csrf_token %}
-    
-    {{form.as_p}}
-    <button type="submit">Save Changes</button>   
+    {% bootstrap_form form alert_error_type="all" %}
+    {% bootstrap_button "Save Changes" button_type="submit" button_class="btn-primary" %}
 </form>
 {% if not user_profile %}
         <a href="{% url "logout" %}">Logout</a>
     {% else %}
-    <button onclick="window.history.back()">Cancel</button>
+    <button onclick="window.history.back()" class="btn btn-info">Cancel</button>
     {% endif %}
 {% endblock %}
 

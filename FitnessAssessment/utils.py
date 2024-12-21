@@ -14,7 +14,8 @@ def calculate_one_mile_test(weight, age, gender, time, heart_rate):
 
 def calculate_max_chest_press(weight, repetition_maximum):
     weight_in_pounds = weight * 2.205
-    max_chest_press = repetition_maximum / weight_in_pounds
+    max_chest_press = (repetition_maximum * 2.205) / weight_in_pounds
     return max_chest_press
 
 
+print(calculate_max_chest_press(80, 90))

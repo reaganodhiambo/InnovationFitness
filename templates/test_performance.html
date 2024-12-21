@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>{{user.username}}'s test perfomance</h1>
+  <a href="{% url 'home' %}">Back home</a>
+    {% if test_perf|length < 1%}
+      <p>No test results exist</p>
+      <button onclick="window.history.back()">Back</button>
+    {% else %}
+      {% for test in test_perf %}
+        <h4>{{test.test_name}}</h4>
+        <p>Test Date: {{test.test_date}}</p>
+        <p>Score: {{test.score}}</p>
+        <p>Rating: {{test.rating}}</p>
+        <hr>
+      {% endfor %}
+    {% endif %}
+{% endblock content %}
