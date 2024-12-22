@@ -176,6 +176,32 @@ class AgeGenderPerformanceRating(models.Model):
             + str(self.age_limit)
         )
 
+
+class WeightGenderPerformanceRating(models.Model):
+    test = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
+    gender = models.ForeignKey(Gender, on_delete=models.PROTECT)
+    weight_limit_type = models.ForeignKey(
+        PerformanceLimit, related_name="WeightPerfLimit_1", on_delete=models.PROTECT
+    )
+    weight_limit = models.DecimalField(max_digits=5, decimal_places=2)
+    performance_limit_type = models.ForeignKey(
+        PerformanceLimit, related_name="WeightPerfLimit_2", on_delete=models.PROTECT
+    )
+    performance_limit = models.DecimalField(max_digits=5, decimal_places=2)
+    rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = (
+            "test",
+            "gender",
+            "weight_limit_type",
+            "weight_limit",
+            "performance_limit_type",
+            "performance_limit",
+            "rating",
+        )
+
+
 class OneMileTestPerformance(models.Model):
     test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
     gender = models.ForeignKey(Gender, on_delete=models.PROTECT)

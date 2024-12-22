@@ -41,6 +41,25 @@ class AgeGenderPerformanceRatingAdmin(admin.ModelAdmin):
         "age_limit",
     )
 
+
+class WeightGenderPerformanceRatingAdmin(admin.ModelAdmin):
+    list_display = (
+        "test",
+        "gender",
+        "weight_limit_type",
+        "weight_limit",
+        "performance_limit_type",
+        "performance_limit",
+        "rating",
+    )
+    list_filter = (
+        "test",
+        "gender",
+        "weight_limit_type",
+        "weight_limit",
+    )
+
+
 class OneMileTestPerformanceAdmin(admin.ModelAdmin):
     list_display = (
         "test_name",
@@ -156,6 +175,7 @@ admin.site.register(AgeBucketing, AgeBucketingAdmin)
 admin.site.register(PerformanceRatingScoring, PerformanceRatingScoringAdmin)
 admin.site.register(PerformanceLimit)
 admin.site.register(AgeGenderPerformanceRating, AgeGenderPerformanceRatingAdmin)
+admin.site.register(WeightGenderPerformanceRating, WeightGenderPerformanceRatingAdmin)
 admin.site.register(OneMileTestPerformance, OneMileTestPerformanceAdmin)
 admin.site.register(MaximumChestPressPerformance, MaximumChestPressPerformanceAdmin)
 admin.site.register(SixtySecSitUpTestPerformance, SixtySecSitUpTestPerformanceAdmin)
@@ -173,3 +193,12 @@ admin.site.register(AgeLimit, AgeLimitAdmin)
 admin.site.register(WeightLimit, WeightLimitAdmin)
 admin.site.register(TestPerformance, TestPerformanceAdmin)
 admin.site.register(PerformanceInput, PerformanceInputAdmin)
+
+
+
+
+
+
+
+
+

@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
+from typing import Final
 
 
 # Create your views here.
@@ -708,6 +709,7 @@ def boneMassTest(request):
             customer = form.cleaned_data["customer"]
             bone_mass = form.cleaned_data["bone_mass"]
             weight = form.cleaned_data["weight_in_kg"]
+            
 
             scoring = performance_rating_lookup(
                 gender=customer.gender,
@@ -897,3 +899,68 @@ def performance_rating_lookup(gender, weight, performance, test_model):
         "rating": score.rating,
     }
     return result
+
+
+def score_for_age_weight(gender, weight, performance, test_model):
+
+    ABOVE: Final(str) = "above"
+    FROM: Final(str) = "from"
+    BELOW: Final(str) = "below"
+
+    p = (
+        test_model.objects.filter(
+            gender__gender=gender,
+            weight_limit_type__type=Case(
+                When(
+                    Q(weight_limit_type__type__exact=ABOVE)
+                    & Q(weight_limit__lt=weight),
+                    then=Value("above"),
+                ),
+                When(
+                    Q(weight_limit_type__type__exact=FROM)
+                    & Q(weight_limit__lte=weight),
+                    then=Value("from"),
+                ),
+                When(
+                    Q(weight_limit_type__type__exact=BELOW)
+                    & Q(weight_limit__gt=weight),
+                    then=Value("below"),
+                ),
+                default=Value("Not Found"),
+                output_field=CharField(max_length=5),
+            ),
+            performance_limit_type__type=Case(
+                When(
+                    Q(performance_limit_type__type__exact=ABOVE)
+                    & Q(performance_limit__lt=performance),
+                    then=Value("above"),
+                ),
+                When(
+                    Q(performance_limit_type__type__exact=FROM)
+                    & Q(performance_limit__lte=performance),
+                    then=Value("from"),
+                ),
+                When(
+                    Q(performance_limit_type__type__exact=BELOW)
+                    & Q(performance_limit__gt=performance),
+                    then=Value("below"),
+                ),
+                default=Value("Not Found"),
+                output_field=CharField(max_length=5),
+            ),
+        )
+        .order_by("-weight_limit", "-performance_limit")
+        .first()
+    )
+
+    result = {
+        "user_performance": performance,
+        "performance_limit": p.performance_limit,
+        "rating": p.rating.rating,
+        "score": p.rating.score,
+    }
+    print(result)
+    return result
+
+
+print(score_for_age_weight("male", 66, 3.09, WeightGenderPerformanceRating))
