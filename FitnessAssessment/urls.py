@@ -17,4 +17,5 @@ urlpatterns = [
     path("visceral_fat", visceralFatTest, name="visceral_fat"),
     path("body-fat", bodyFatTest, name="bodyfat"),
     path("bone-mass", boneMassTest, name="bonemass"),
+    path("test-performance", get_test_performance, name="test_performance"),
 ]

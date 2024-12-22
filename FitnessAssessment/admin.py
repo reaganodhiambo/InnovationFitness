@@ -24,6 +24,23 @@ class AgeBucketingAdmin(admin.ModelAdmin):
     list_filter = ("min_age", "max_age", "test_name")
 
 
+class AgeGenderPerformanceRatingAdmin(admin.ModelAdmin):
+    list_display = (
+        "test",
+        "gender",
+        "age_limit_type",
+        "age_limit",
+        "performance_limit_type",
+        "performance_limit",
+        "rating",
+    )
+    list_filter = (
+        "test",
+        "gender",
+        "age_limit_type",
+        "age_limit",
+    )
+
 class OneMileTestPerformanceAdmin(admin.ModelAdmin):
     list_display = (
         "test_name",
@@ -88,6 +105,18 @@ class TestPerformanceAdmin(admin.ModelAdmin):
     list_filter = ("test_name", "test_date", "rating")
 
 
+class SixtySecSitUpTestPerformanceAdmin(admin.ModelAdmin):
+    list_display = (
+        "test_name",
+        "gender",
+        "min_age",
+        "max_age",
+        "limit_type",
+        "performance",
+    )
+    list_filter = ("gender", "performance")
+
+
 class PerformanceRatingScoringAdmin(admin.ModelAdmin):
     list_display = (
         "test_name",
@@ -126,9 +155,10 @@ admin.site.register(FitnessTest, FitnessTestAdmin)
 admin.site.register(AgeBucketing, AgeBucketingAdmin)
 admin.site.register(PerformanceRatingScoring, PerformanceRatingScoringAdmin)
 admin.site.register(PerformanceLimit)
+admin.site.register(AgeGenderPerformanceRating, AgeGenderPerformanceRatingAdmin)
 admin.site.register(OneMileTestPerformance, OneMileTestPerformanceAdmin)
 admin.site.register(MaximumChestPressPerformance, MaximumChestPressPerformanceAdmin)
-admin.site.register(SixtySecSitUpTestPerformance)
+admin.site.register(SixtySecSitUpTestPerformance, SixtySecSitUpTestPerformanceAdmin)
 admin.site.register(ThePushUpTestPerformance)
 admin.site.register(SitAndReachTestPerformance)
 admin.site.register(WaistHipRatioTestPerformance, WaistHipRatioTestPerformanceAdmin)

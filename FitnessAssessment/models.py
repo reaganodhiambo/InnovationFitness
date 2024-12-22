@@ -130,7 +130,7 @@ class PerformanceRatingScoring(models.Model):
         unique_together = ("test_name", "rating")
 
     def __str__(self):
-        return str(self.rating)
+        return str(self.test_name) + ": " + str(self.rating)
 
 
 class PerformanceLimit(models.Model):
@@ -140,6 +140,41 @@ class PerformanceLimit(models.Model):
     def __str__(self):
         return self.type
 
+
+class AgeGenderPerformanceRating(models.Model):
+    test = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
+    gender = models.ForeignKey(Gender, on_delete=models.PROTECT)
+    age_limit_type = models.ForeignKey(
+        PerformanceLimit, related_name="PerformanceLimit_1", on_delete=models.PROTECT
+    )
+    age_limit = models.PositiveIntegerField(null=True)
+    performance_limit_type = models.ForeignKey(
+        PerformanceLimit, related_name="PerformanceLimit_2", on_delete=models.PROTECT
+    )
+    performance_limit = models.DecimalField(max_digits=5, decimal_places=2)
+    rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = (
+            "test",
+            "gender",
+            "age_limit_type",
+            "age_limit",
+            "performance_limit_type",
+            "performance_limit",
+            "rating"
+        )
+
+    def __str__(self):
+        return (
+            str(self.test)
+            + ": "
+            + str(self.gender)
+            + ": "
+            + str(self.age_limit_type)
+            + ": "
+            + str(self.age_limit)
+        )
 
 class OneMileTestPerformance(models.Model):
     test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)

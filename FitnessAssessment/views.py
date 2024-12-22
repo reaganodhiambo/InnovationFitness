@@ -13,9 +13,17 @@ from django.contrib import messages
 
 
 # Create your views here.
+
+
 @login_required(login_url="login")
 def index(request):
     user = request.user
+    try:
+        admin = user.is_staff
+        user_profile = UserProfile.objects.get(user=user.id)
+    except:
+        return redirect("update_user_profile", user.id)
+
     test_urls = {
         "The One Mile Test": "onemiletest",
         "Maximum Chest Press Test": "chest_press",
@@ -66,7 +74,8 @@ def loginUser(request):
             else:
                 return redirect("home")
         else:
-            return HttpResponse("Invalid username or password")
+            messages.error(request, "Invalid username or password")
+            return redirect("login")
     else:
         form = AuthenticationForm()
 
@@ -109,7 +118,8 @@ def updateUserProfile(request, id):
         else:
             form = UserProfileForm(instance=initial)
     else:
-        return HttpResponse("You are not authorized to update this user's profile")
+        messages.error(request, "You are not authorized to update this user's profile")
+        return redirect(request.path_info)
 
     context = {"form": form, "user": user, "user_profile": user_profile}
     return render(request, "update_user_profile.html", context=context)
@@ -732,6 +742,20 @@ def boneMassTest(request):
         form = BoneMassForm(initial=initial_dict)
     context = {"form": form, "test_name": test_model.test_name}
     return render(request, "test_input.html", context=context)
+
+
+"""retrieve test performance  for a given customer and date"""
+
+
+@login_required(login_url="login")
+def get_test_performance(request):
+    user = request.user
+    customer = UserProfile.objects.get(user=user.id)
+    if user:
+        test_perf = TestPerformance.objects.filter(customer=customer).all()
+
+    context = {"user": user, "test_perf": test_perf}
+    return render(request, "test_performance.html", context=context)
 
 
 def record_test_score(customer, test_name, rating, score, test_date):

@@ -1,13 +1,22 @@
 {% extends 'base.html' %}
 
 {% block title %}Login{% endblock %}
-
+{% load django_bootstrap5 %}
 {% block content %}
-<h2>Login</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
-</form>
-<p>New User? <a href="{% url 'register' %}">Register</a></p>
+<div class="row d-flex justify-content-center">
+    <div class="col-4 mt-4 card">
+        <h3 style="font-family: Georgia, serif; font-size: 40px;" class="text-center my-5">Login Page</h3>
+        <form action="" method="post" novalidate>
+            {% csrf_token %}
+            {% for message in messages %}
+            {% bootstrap_messages %}
+            {% endfor %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn  btn-primary btn-block mt-4 text-center">login</button>
+        </form>
+        <div class="text-center mt-4 mb-4">
+            <p>Not a member? <a class="text-primary" href="{% url 'register' %}"><b>Register</b></a></p>
+        </div>
+    </div>
+</div>
 {% endblock %}
