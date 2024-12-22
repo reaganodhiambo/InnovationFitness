@@ -692,7 +692,9 @@ def bodyFatTest(request):
 
 @login_required(login_url="login")
 def boneMassTest(request):
-    test_model = BoneMassTestPerformance.objects.all()[0]
+    # test_model = WeightGenderPerformanceRating.objects.all()[0]
+    test_model = FitnessTest.objects.get(test_name="Bone Mass")
+
     if request.method == "POST":
         form = BoneMassForm(request.POST)
         if form.is_valid():
@@ -711,9 +713,10 @@ def boneMassTest(request):
             weight = form.cleaned_data["weight_in_kg"]
 
             scoring = gender_weight_scoring(
+                test_name=test_model.test_name,
                 gender=customer.gender,
                 weight=weight,
-                test_model=WeightGenderPerformanceRating,
+                scoring_model=WeightGenderPerformanceRating,
                 performance=bone_mass,
             )
             print("scoring: ", scoring)
@@ -727,7 +730,7 @@ def boneMassTest(request):
 
             record_test_score(
                 customer=customer,
-                test_name=test_model.test_name,
+                test_name=test_model.id,
                 rating=scoring["rating"],
                 score=scoring["score"],
                 test_date=datetime.date.today(),
@@ -900,14 +903,75 @@ def performance_rating_lookup(gender, weight, performance, test_model):
     return result
 
 
-def gender_weight_scoring(gender, weight, performance, test_model):
+def gender_age_scoring(test_name, gender, age, performance, scoring_model):
 
     ABOVE: Final(str) = "above"
     FROM: Final(str) = "from"
     BELOW: Final(str) = "below"
 
     p = (
-        test_model.objects.filter(
+        scoring_model.objects.filter(
+            test__test_name=test_name,
+            gender__gender=gender,
+            age_limit_type__type=Case(
+                When(
+                    Q(age_limit_type__type__exact=ABOVE) & Q(age_limit__lt=age),
+                    then=Value("above"),
+                ),
+                When(
+                    Q(age_limit_type__type__exact=FROM) & Q(age_limit__lte=age),
+                    then=Value("from"),
+                ),
+                When(
+                    Q(age_limit_type__type__exact=BELOW) & Q(age_limit__gt=age),
+                    then=Value("below"),
+                ),
+                default=Value("Not Found"),
+                output_field=CharField(max_length=5),
+            ),
+            performance_limit_type__type=Case(
+                When(
+                    Q(performance_limit_type__type__exact=ABOVE)
+                    & Q(performance_limit__lt=performance),
+                    then=Value("above"),
+                ),
+                When(
+                    Q(performance_limit_type__type__exact=FROM)
+                    & Q(performance_limit__lte=performance),
+                    then=Value("from"),
+                ),
+                When(
+                    Q(performance_limit_type__type__exact=BELOW)
+                    & Q(performance_limit__gt=performance),
+                    then=Value("below"),
+                ),
+                default=Value("Not Found"),
+                output_field=CharField(max_length=5),
+            ),
+        )
+        .order_by("-age_limit", "-performance_limit")
+        .first()
+    )
+
+    result = {
+        "user_performance": performance,
+        "performance_limit": p.performance_limit,
+        "rating": p.rating.rating,
+        "score": p.rating.score,
+    }
+    return result
+
+
+# print(gender_age_scoring("male", 34, 38.9, AgeGenderPerformanceRating))
+def gender_weight_scoring(test_name, gender, weight, performance, scoring_model):
+
+    ABOVE: Final(str) = "above"
+    FROM: Final(str) = "from"
+    BELOW: Final(str) = "below"
+
+    p = (
+        scoring_model.objects.filter(
+            test__test_name=test_name,
             gender__gender=gender,
             weight_limit_type__type=Case(
                 When(
@@ -959,6 +1023,3 @@ def gender_weight_scoring(gender, weight, performance, test_model):
         "score": p.rating.score,
     }
     return result
-
-
-# print(gender_weight_scoring("male", 66, 3.09, WeightGenderPerformanceRating))
