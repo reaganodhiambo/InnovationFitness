@@ -1,15 +1,9 @@
 {% extends "base.html" %}
-{% block tab_content %}
+{% block content %}
  <h3>{{ test_name }}</h3>
 {% load django_bootstrap5 %}
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-        {% bootstrap_messages %}
-    {% endfor %}
-</ul>
-{% endif %}
+
 <form method="post">
     {% csrf_token %}
     {% bootstrap_form form alert_error_type="all"%}

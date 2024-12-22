@@ -703,21 +703,20 @@ def boneMassTest(request):
                 )
                 return redirect(request.path_info)
             if request.user.id != form.cleaned_data["customer"].user.id:
-                return HttpResponse(
-                    "You are not authorized to update this customer's  test data"
-                )
+                messages.error(request, "You are not authorized to update this customer's  test data")
+                return redirect(request.path_info)
+
             customer = form.cleaned_data["customer"]
             bone_mass = form.cleaned_data["bone_mass"]
             weight = form.cleaned_data["weight_in_kg"]
-            
 
-            scoring = performance_rating_lookup(
+            scoring = gender_weight_scoring(
                 gender=customer.gender,
                 weight=weight,
-                test_model=BoneMassTestPerformance,
+                test_model=WeightGenderPerformanceRating,
                 performance=bone_mass,
             )
-
+            print("scoring: ", scoring)
             test_input_instance = get_test_input_instance(
                 customer.id, datetime.date.today()
             )
@@ -730,7 +729,7 @@ def boneMassTest(request):
                 customer=customer,
                 test_name=test_model.test_name,
                 rating=scoring["rating"],
-                score=scoring["user_score"],
+                score=scoring["score"],
                 test_date=datetime.date.today(),
             )
             return redirect("home")
@@ -901,7 +900,7 @@ def performance_rating_lookup(gender, weight, performance, test_model):
     return result
 
 
-def score_for_age_weight(gender, weight, performance, test_model):
+def gender_weight_scoring(gender, weight, performance, test_model):
 
     ABOVE: Final(str) = "above"
     FROM: Final(str) = "from"
@@ -959,8 +958,7 @@ def score_for_age_weight(gender, weight, performance, test_model):
         "rating": p.rating.rating,
         "score": p.rating.score,
     }
-    print(result)
     return result
 
 
-print(score_for_age_weight("male", 66, 3.09, WeightGenderPerformanceRating))
+# print(gender_weight_scoring("male", 66, 3.09, WeightGenderPerformanceRating))

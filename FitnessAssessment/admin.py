@@ -98,27 +98,6 @@ class MaximumChestPressPerformanceAdmin(admin.ModelAdmin):
     list_filter = ("gender", "rating")
 
 
-class AgeLimitAdmin(admin.ModelAdmin):
-    list_display = ("test_name", "age_limit", "limit_type")
-    list_filter = ("test_name",)
-
-
-class WeightLimitAdmin(admin.ModelAdmin):
-    list_display = ("test_name", "gender", "weight_limit", "limit_type")
-    list_filter = ("test_name", "gender")
-
-
-class BoneMassTestPerformanceAdmin(admin.ModelAdmin):
-    list_display = (
-        "test_name",
-        "weight_limit",
-        "performance",
-        "performance_limit_type",
-        "rating",
-    )
-    list_filter = ("weight_limit",)
-
-
 class TestPerformanceAdmin(admin.ModelAdmin):
     list_display = ("test_name", "test_date", "customer", "rating", "score")
     list_filter = ("test_name", "test_date", "rating")
@@ -161,11 +140,6 @@ class BMITestPerformanceAdmin(admin.ModelAdmin):
     list_display = ("test_name", "rating", "limit_type", "performance")
 
 
-class BoneMassWeightBucketingAdmin(admin.ModelAdmin):
-    list_display = ("gender", "min_weight", "max_weight")
-    list_filter = ("gender", "min_weight")
-
-
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(TestInput)
 admin.site.register(Gender)
@@ -187,18 +161,5 @@ admin.site.register(BodyFatTestPerformance)
 admin.site.register(
     VisceralFatRatingTestPerformance, VisceralFatRatingTestPerformanceAdmin
 )
-admin.site.register(BoneMassWeightBucketing, BoneMassWeightBucketingAdmin)
-admin.site.register(BoneMassTestPerformance, BoneMassTestPerformanceAdmin)
-admin.site.register(AgeLimit, AgeLimitAdmin)
-admin.site.register(WeightLimit, WeightLimitAdmin)
 admin.site.register(TestPerformance, TestPerformanceAdmin)
 admin.site.register(PerformanceInput, PerformanceInputAdmin)
-
-
-
-
-
-
-
-
-

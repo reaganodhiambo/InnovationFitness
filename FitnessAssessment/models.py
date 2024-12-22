@@ -4,16 +4,16 @@ from django.db.models.functions import Concat, Cast
 from datetime import datetime
 from django.contrib.auth.models import User
 
+
 class UserProfile(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     gender = [
         ("Male", "Male"),
         ("Female", "Female"),
     ]
-    phone_number = models.CharField(max_length=256, blank=False,null=True)
+    phone_number = models.CharField(max_length=256, blank=False, null=True)
     age = models.PositiveIntegerField(blank=False)
     gender = models.CharField(max_length=10, choices=gender)
-
 
     class Meta:
         verbose_name = "User Profile"
@@ -162,7 +162,7 @@ class AgeGenderPerformanceRating(models.Model):
             "age_limit",
             "performance_limit_type",
             "performance_limit",
-            "rating"
+            "rating",
         )
 
     def __str__(self):
@@ -307,70 +307,6 @@ class VisceralFatRatingTestPerformance(models.Model):
     test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
     limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
     performance = models.PositiveIntegerField()
-    rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return str(self.test_name)
-
-
-class BoneMassWeightBucketing(models.Model):
-    gender = models.ForeignKey(Gender, on_delete=models.CASCADE)
-    min_weight = models.PositiveIntegerField(blank=True, null=True)
-    max_weight = models.PositiveIntegerField(blank=True, null=True)
-
-    def __str__(self):
-        return (
-            str(self.gender)
-            + ": "
-            + str(self.min_weight)
-            + " - "
-            + str(self.max_weight)
-        )
-
-
-class AgeLimit(models.Model):
-    test_name = models.ForeignKey(FitnessTest, on_delete=models.CASCADE)
-    age_limit = models.PositiveIntegerField(blank=True, null=True)
-    limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return (
-            str(self.test_name)
-            + ": "
-            + str(self.limit_type)
-            + ": "
-            + str(self.age_limit)
-        )
-
-
-class WeightLimit(models.Model):
-    test_name = models.ForeignKey(FitnessTest, on_delete=models.CASCADE)
-    gender = models.ForeignKey(Gender, on_delete=models.PROTECT)
-    weight_limit = models.PositiveIntegerField(blank=True, null=True)
-    limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
-
-    class Meta:
-        unique_together = ("test_name", "gender", "weight_limit", "limit_type")
-
-    def __str__(self):
-        return (
-            str(self.test_name)
-            + ": "
-            + str(self.gender)
-            + ": "
-            + str(self.limit_type)
-            + ": "
-            + str(self.weight_limit)
-        )
-
-
-class BoneMassTestPerformance(models.Model):
-    test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
-    weight_limit = models.ForeignKey(WeightLimit, on_delete=models.PROTECT)
-    performance = models.DecimalField(max_digits=3, decimal_places=2)
-    performance_limit_type = models.ForeignKey(
-        PerformanceLimit, on_delete=models.PROTECT
-    )
     rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
 
     def __str__(self):
