@@ -146,3 +146,14 @@ class MuscleMassTestForm(forms.ModelForm):
             "score": forms.HiddenInput(),
             "customer": forms.HiddenInput(),
         }
+
+class BoneMassTestForm(forms.ModelForm):
+
+    class Meta:
+        model = BoneMassTest
+        fields = "__all__"
+        widgets = {
+            "rating": forms.HiddenInput(),
+            "score": forms.HiddenInput(),
+            "customer": forms.HiddenInput(),
+        }

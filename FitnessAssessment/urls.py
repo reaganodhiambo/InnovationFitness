@@ -19,4 +19,6 @@ urlpatterns = [
     path("waist-hip-ratio-test", WaistHipRatioTestView, name="waist-hip-ratio-test"),
     path("bmi", BMITestView, name="bmi-test"),
     path("visceral-fat-test", VisceralFatTestView, name="visceral-fat-test"),
+    path("bone-mass-test", BoneMassTestView, name="bone-mass-test"),
+    path("body-fat-test", BodyFatTestView, name="body-fat-test"),
 ]
