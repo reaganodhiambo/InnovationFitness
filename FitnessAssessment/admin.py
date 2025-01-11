@@ -99,8 +99,8 @@ class MaximumChestPressPerformanceAdmin(admin.ModelAdmin):
 
 
 class TestPerformanceAdmin(admin.ModelAdmin):
-    list_display = ("test_name", "test_date", "customer", "rating", "score")
-    list_filter = ("test_name", "test_date", "rating")
+    list_display = ("test", "test_date", "customer", "rating", "score")
+    list_filter = ("test", "test_date", "rating")
 
 
 class SixtySecSitUpTestPerformanceAdmin(admin.ModelAdmin):

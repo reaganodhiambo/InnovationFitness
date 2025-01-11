@@ -3,6 +3,7 @@
 {% if user.is_authenticated %}
   <p>Hello {{user.username}} </p>
 <a href="{% url 'update_user_profile' user.id %}">Update User Profile</a><br>
+<a href="{% url 'update-profile' user.id %}">Update User Temp Profile</a><br>
 <a href="{% url 'test_performance'%}">View My Performance</a><br>
 <a href="{% url 'logout' %}">Logout</a>
 {% endif %}

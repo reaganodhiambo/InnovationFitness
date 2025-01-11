@@ -316,12 +316,12 @@ class VisceralFatRatingTestPerformance(models.Model):
 class TestPerformance(models.Model):
     test_date = models.DateField()
     customer = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
-    test_name = models.ForeignKey(FitnessTest, on_delete=models.DO_NOTHING)
+    test = models.ForeignKey(FitnessTest, on_delete=models.DO_NOTHING)
     rating = models.CharField(max_length=50, null=True)
     score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
 
     class Meta:
-        unique_together = ("customer", "test_name", "test_date")
+        unique_together = ("customer", "test", "test_date")
 
     def __str__(self):
         return str(self.test_date)

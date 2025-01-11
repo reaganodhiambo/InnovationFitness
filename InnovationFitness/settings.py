@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     "FitnessAssessment",
+    "CustomerFitness",
     "django_bootstrap5",
 ]
 

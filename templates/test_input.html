@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
- <h3>{{ test_name }}</h3>
 {% load django_bootstrap5 %}
-
-
+ <h3>{{ test_name }}</h3>
 <form method="post">
     {% csrf_token %}
     {% bootstrap_form form alert_error_type="all"%}

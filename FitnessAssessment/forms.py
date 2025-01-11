@@ -102,3 +102,5 @@ class BoneMassForm(forms.ModelForm):
         model = TestInput
         fields = ["customer", "weight_in_kg", "bone_mass"]
         widgets = {"customer": forms.HiddenInput()}
+
+

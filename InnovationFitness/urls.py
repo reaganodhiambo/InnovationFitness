@@ -23,4 +23,5 @@ admin.site.site_header = "Innovation Fitness"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("FitnessAssessment.urls")),
+    path("temp/", include("CustomerFitness.urls")),
 ]

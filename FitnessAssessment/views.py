@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from .forms import *
 from .models import *
-from .utils import calculate_one_mile_test, calculate_max_chest_press
+from .utils import *
 from django.db import connection
 from django.db.models import Case, When, PositiveIntegerField, CharField, Value, Max, Q
 import datetime
@@ -11,7 +11,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from typing import Final
-
+from CustomerFitness.models import UserTestProfile
 
 # Create your views here.
 
@@ -66,12 +66,12 @@ def loginUser(request):
         if user is not None:
             login(request, user)
             try:
-                user_profile = UserProfile.objects.get(user_id=user.id)
+                user_profile = UserTestProfile.objects.get(user_id=user.id)
             except:
                 user_profile = None
 
             if not user_profile:
-                return redirect("update_user_profile", user.id)
+                return redirect("update-profile", user.id)
             else:
                 return redirect("home")
         else:
@@ -195,55 +195,6 @@ def oneMileTest(request):
     context = {"form": form, "test_name": test_model.test_name}
     return render(request, "test_input.html", context=context)
 
-
-def age_gender_performance_rating(gender, age, performance, test_model):
-    p = (
-        test_model.objects.select_related("test_name", "gender", "limit_type", "rating")
-        .filter(
-            gender__gender=gender,
-            min_age__lte=Case(
-                When(min_age__isnull=True, then=age),
-                default="min_age",
-                output_field=PositiveIntegerField(),
-            ),
-            max_age__gte=Case(
-                When(max_age__isnull=True, then=age),
-                default="max_age",
-                output_field=PositiveIntegerField(),
-            ),
-            limit_type__type=Case(
-                When(
-                    Q(limit_type__type__iexact="above")
-                    & Q(performance__lte=performance),
-                    then=Value("above"),
-                ),
-                When(
-                    Q(limit_type__type__iexact="from")
-                    & Q(performance__lte=performance),
-                    then=Value("from"),
-                ),
-                When(
-                    Q(limit_type__type__iexact="below")
-                    & Q(performance__gt=performance),
-                    then=Value("below"),
-                ),
-                default=Value("Not Found"),
-                output_field=CharField(max_length=5),
-            ),
-        )
-        .order_by("-performance")
-        .first()
-    )
-    score = PerformanceRatingScoring.objects.filter(
-        rating__iexact=p.rating, test_name__test_name__iexact=p.test_name
-    ).first()
-
-    result = {
-        "user_performance": p.performance,
-        "user_score": score.score,
-        "rating": score.rating,
-    }
-    return result
 
 
 """Max Chest Press"""
@@ -730,7 +681,7 @@ def boneMassTest(request):
 
             record_test_score(
                 customer=customer,
-                test_name=test_model.id,
+                test=test_model.id,
                 rating=scoring["rating"],
                 score=scoring["score"],
                 test_date=datetime.date.today(),
@@ -762,264 +713,3 @@ def get_test_performance(request):
     return render(request, "test_performance.html", context=context)
 
 
-def record_test_score(customer, test_name, rating, score, test_date):
-    print("test_date: ", test_date)
-    test_performances = TestPerformance.objects.filter(
-        customer=customer, test_name=test_name, test_date=test_date
-    )
-    if len(test_performances) < 1:
-        test_record = TestPerformance.objects.create(
-            customer=customer,
-            test_name=test_name,
-            test_date=test_date,
-        )
-    elif len(test_performances) > 1:
-        return HttpResponse("Multiple test records returned")
-    else:
-        test_record = test_performances[0]
-
-    test_record.rating = rating
-    test_record.score = score
-    test_record.save(update_fields=["rating", "score"])
-
-
-def get_test_input_instance(customer_id, test_date):
-    test_inputs = TestInput.objects.filter(customer_id=customer_id, test_date=test_date)
-
-    if len(test_inputs) < 1:
-        # create instance and save
-        test_input_instance = TestInput.objects.create(
-            customer_id=customer_id, test_date=test_date
-        )
-    elif len(test_inputs) > 1:
-        # error - multiple items
-        raise Exception("Multiple test input records returned")
-    else:
-        test_input_instance = test_inputs[0]
-
-    return test_input_instance
-
-
-def limit_type_performance_rating(performance, test_model):
-    p = (
-        test_model.objects.select_related("test_name", "limit_type", "rating")
-        .filter(
-            limit_type__type=Case(
-                When(
-                    Q(limit_type__type__iexact="above")
-                    & Q(performance__lte=performance),
-                    then=Value("above"),
-                ),
-                When(
-                    Q(limit_type__type__iexact="from")
-                    & Q(performance__lte=performance),
-                    then=Value("from"),
-                ),
-                When(
-                    Q(limit_type__type__iexact="below")
-                    & Q(performance__gt=performance),
-                    then=Value("below"),
-                ),
-                default=Value("Not Found"),
-                output_field=CharField(max_length=5),
-            ),
-        )
-        .order_by("-performance")
-        .first()
-    )
-    print("**********printing one mile test rating p*********  ", p)
-    score = PerformanceRatingScoring.objects.filter(
-        rating__iexact=p.rating, test_name__test_name__iexact=p.test_name
-    ).first()
-
-    result = {
-        "user_performance": p.performance,
-        "user_score": score.score,
-        "rating": score.rating,
-    }
-    return result
-
-
-def performance_rating_lookup(gender, weight, performance, test_model):
-    print("gender, weight, performance: ", gender, weight, performance)
-    p = (
-        test_model.objects.select_related(
-            "test_name", "performance_limit_type", "rating"
-        )
-        .filter(
-            weight_limit__gender__gender=gender,
-            weight_limit__limit_type__type=Case(
-                When(
-                    Q(weight_limit__limit_type__type__iexact="above")
-                    & Q(weight_limit__weight_limit__lt=weight),
-                    then=Value("above"),
-                ),
-                When(
-                    Q(weight_limit__limit_type__type__iexact="from")
-                    & Q(weight_limit__weight_limit__lte=weight),
-                    then=Value("from"),
-                ),
-                When(
-                    Q(weight_limit__limit_type__type__iexact="below")
-                    & Q(weight_limit__weight_limit__gt=weight),
-                    then=Value("below"),
-                ),
-                default=Value("Not Found"),
-                output_field=CharField(max_length=5),
-            ),
-            performance_limit_type__type=Case(
-                When(
-                    Q(performance_limit_type__type__iexact="above")
-                    & Q(performance__lt=performance),
-                    then=Value("above"),
-                ),
-                When(
-                    Q(performance_limit_type__type__iexact="from")
-                    & Q(performance__lte=performance),
-                    then=Value("from"),
-                ),
-                When(
-                    Q(performance_limit_type__type__iexact="below")
-                    & Q(performance__gt=performance),
-                    then=Value("below"),
-                ),
-                default=Value("Not Found"),
-                output_field=CharField(max_length=5),
-            ),
-        )
-        .order_by("-weight_limit", "-performance")
-        .first()
-    )
-
-    score = PerformanceRatingScoring.objects.filter(
-        rating__iexact=p.rating, test_name__test_name__iexact=p.test_name
-    ).first()
-
-    result = {
-        "user_performance": p.performance,
-        "user_score": score.score,
-        "rating": score.rating,
-    }
-    return result
-
-
-def gender_age_scoring(test_name, gender, age, performance, scoring_model):
-
-    ABOVE: Final(str) = "above"
-    FROM: Final(str) = "from"
-    BELOW: Final(str) = "below"
-
-    p = (
-        scoring_model.objects.filter(
-            test__test_name=test_name,
-            gender__gender=gender,
-            age_limit_type__type=Case(
-                When(
-                    Q(age_limit_type__type__exact=ABOVE) & Q(age_limit__lt=age),
-                    then=Value("above"),
-                ),
-                When(
-                    Q(age_limit_type__type__exact=FROM) & Q(age_limit__lte=age),
-                    then=Value("from"),
-                ),
-                When(
-                    Q(age_limit_type__type__exact=BELOW) & Q(age_limit__gt=age),
-                    then=Value("below"),
-                ),
-                default=Value("Not Found"),
-                output_field=CharField(max_length=5),
-            ),
-            performance_limit_type__type=Case(
-                When(
-                    Q(performance_limit_type__type__exact=ABOVE)
-                    & Q(performance_limit__lt=performance),
-                    then=Value("above"),
-                ),
-                When(
-                    Q(performance_limit_type__type__exact=FROM)
-                    & Q(performance_limit__lte=performance),
-                    then=Value("from"),
-                ),
-                When(
-                    Q(performance_limit_type__type__exact=BELOW)
-                    & Q(performance_limit__gt=performance),
-                    then=Value("below"),
-                ),
-                default=Value("Not Found"),
-                output_field=CharField(max_length=5),
-            ),
-        )
-        .order_by("-age_limit", "-performance_limit")
-        .first()
-    )
-
-    result = {
-        "user_performance": performance,
-        "performance_limit": p.performance_limit,
-        "rating": p.rating.rating,
-        "score": p.rating.score,
-    }
-    return result
-
-
-# print(gender_age_scoring("male", 34, 38.9, AgeGenderPerformanceRating))
-def gender_weight_scoring(test_name, gender, weight, performance, scoring_model):
-
-    ABOVE: Final(str) = "above"
-    FROM: Final(str) = "from"
-    BELOW: Final(str) = "below"
-
-    p = (
-        scoring_model.objects.filter(
-            test__test_name=test_name,
-            gender__gender=gender,
-            weight_limit_type__type=Case(
-                When(
-                    Q(weight_limit_type__type__exact=ABOVE)
-                    & Q(weight_limit__lt=weight),
-                    then=Value("above"),
-                ),
-                When(
-                    Q(weight_limit_type__type__exact=FROM)
-                    & Q(weight_limit__lte=weight),
-                    then=Value("from"),
-                ),
-                When(
-                    Q(weight_limit_type__type__exact=BELOW)
-                    & Q(weight_limit__gt=weight),
-                    then=Value("below"),
-                ),
-                default=Value("Not Found"),
-                output_field=CharField(max_length=5),
-            ),
-            performance_limit_type__type=Case(
-                When(
-                    Q(performance_limit_type__type__exact=ABOVE)
-                    & Q(performance_limit__lt=performance),
-                    then=Value("above"),
-                ),
-                When(
-                    Q(performance_limit_type__type__exact=FROM)
-                    & Q(performance_limit__lte=performance),
-                    then=Value("from"),
-                ),
-                When(
-                    Q(performance_limit_type__type__exact=BELOW)
-                    & Q(performance_limit__gt=performance),
-                    then=Value("below"),
-                ),
-                default=Value("Not Found"),
-                output_field=CharField(max_length=5),
-            ),
-        )
-        .order_by("-weight_limit", "-performance_limit")
-        .first()
-    )
-
-    result = {
-        "user_performance": performance,
-        "performance_limit": p.performance_limit,
-        "rating": p.rating.rating,
-        "score": p.rating.score,
-    }
-    return result
