@@ -2,6 +2,7 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from .models import UserProfile
 
+
 def user_profile_required(view_func):
     def wrapper(request, *args, **kwargs):
         if request.user.is_authenticated:

@@ -4,17 +4,6 @@ from .models import *
 # Register your models here.
 
 
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = (
-        "user",
-        "gender",
-        "age",
-    )
-    readonly_fields = ("user",)
-    search_fields = ("user",)
-    ordering = ("user",)
-
-
 class FitnessTestAdmin(admin.ModelAdmin):
     list_display = ("test_name", "category")
 
@@ -140,26 +129,23 @@ class BMITestPerformanceAdmin(admin.ModelAdmin):
     list_display = ("test_name", "rating", "limit_type", "performance")
 
 
-admin.site.register(UserProfile, UserProfileAdmin)
-admin.site.register(TestInput)
-admin.site.register(Gender)
+admin.site.register(UserProfile)
 admin.site.register(Category)
 admin.site.register(FitnessTest, FitnessTestAdmin)
-admin.site.register(AgeBucketing, AgeBucketingAdmin)
+admin.site.register(Gender)
 admin.site.register(PerformanceRatingScoring, PerformanceRatingScoringAdmin)
 admin.site.register(PerformanceLimit)
 admin.site.register(AgeGenderPerformanceRating, AgeGenderPerformanceRatingAdmin)
 admin.site.register(WeightGenderPerformanceRating, WeightGenderPerformanceRatingAdmin)
-admin.site.register(OneMileTestPerformance, OneMileTestPerformanceAdmin)
-admin.site.register(MaximumChestPressPerformance, MaximumChestPressPerformanceAdmin)
-admin.site.register(SixtySecSitUpTestPerformance, SixtySecSitUpTestPerformanceAdmin)
-admin.site.register(ThePushUpTestPerformance)
-admin.site.register(SitAndReachTestPerformance)
-admin.site.register(WaistHipRatioTestPerformance, WaistHipRatioTestPerformanceAdmin)
 admin.site.register(BMITestPerformance, BMITestPerformanceAdmin)
-admin.site.register(BodyFatTestPerformance)
 admin.site.register(
     VisceralFatRatingTestPerformance, VisceralFatRatingTestPerformanceAdmin
 )
-admin.site.register(TestPerformance, TestPerformanceAdmin)
-admin.site.register(PerformanceInput, PerformanceInputAdmin)
+admin.site.register(TheOneMileTest)
+admin.site.register(MaximumChestPressTest)
+admin.site.register(SixtySecondSitUpTest)
+admin.site.register(ThePushUpTest)
+admin.site.register(SitAndReachTest)
+admin.site.register(WaistHipRatioTest)
+admin.site.register(BMITest)
+admin.site.register(VisceralFatRatingTest)

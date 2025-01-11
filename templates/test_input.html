@@ -1,10 +1,12 @@
 {% extends "base.html" %}
+{% block title %}{{ test_name }}{% endblock title %}
+
 {% block content %}
 {% load django_bootstrap5 %}
  <h3>{{ test_name }}</h3>
-<form method="post">
+<form method="post" class="form">
     {% csrf_token %}
-    {% bootstrap_form form alert_error_type="all"%}
+    {{form.as_p}}
     <button type="submit">Submit</button>
 </form>
 <a href="{% url 'home' %}">Back to tests</a>

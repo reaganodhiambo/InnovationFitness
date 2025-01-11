@@ -6,7 +6,7 @@
 
 <form method="post">
     {% csrf_token %}
-    {% bootstrap_form form alert_error_type="all" %}
+    {{form.as_p}}
     {% bootstrap_button "Save Changes" button_type="submit" button_class="btn-primary" %}
 </form>
 {% if not user_profile %}

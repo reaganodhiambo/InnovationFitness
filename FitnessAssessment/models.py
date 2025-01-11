@@ -3,17 +3,24 @@ from django.db.models import When, Case, Value
 from django.db.models.functions import Concat, Cast
 from datetime import datetime
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="profile", blank=True
+    )
     gender = [
         ("Male", "Male"),
         ("Female", "Female"),
     ]
-    phone_number = models.CharField(max_length=256, blank=False, null=True)
-    age = models.PositiveIntegerField(blank=False)
     gender = models.CharField(max_length=10, choices=gender)
+    age = models.PositiveIntegerField(null=True)
+    height = models.PositiveIntegerField(null=True, verbose_name="Height (cm)")
+    weight = models.PositiveIntegerField(null=True, verbose_name="Weight (kg)")
+    phone_number = models.CharField(max_length=256, blank=False, null=True)
+    created = models.DateField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "User Profile"
@@ -21,33 +28,6 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
-
-
-class TestInput(models.Model):
-    customer = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    percentage_body_fat = models.PositiveIntegerField(null=True)
-    waist_measurement = models.PositiveIntegerField(null=True)
-    hip_measurement = models.PositiveIntegerField(null=True)
-    muscle_mass = models.PositiveIntegerField(null=True)
-    height_in_cm = models.PositiveIntegerField(null=True)
-    weight_in_kg = models.PositiveIntegerField(null=True)
-    bone_mass = models.DecimalField(decimal_places=2, max_digits=3, null=True)
-    metabolic_age = models.PositiveIntegerField(null=True)
-    bmi = models.PositiveIntegerField(null=True)
-    visceral_fat_rating = models.PositiveIntegerField(null=True)
-    one_mile_time = models.DecimalField(decimal_places=2, max_digits=4, null=True)
-    exercise_heart_rate = models.DecimalField(decimal_places=2, max_digits=4, null=True)
-    repetition_maximum = models.DecimalField(decimal_places=2, max_digits=4, null=True)
-    no_of_situps = models.PositiveIntegerField(null=True)
-    no_of_push_ups = models.PositiveIntegerField(null=True)
-    sit_and_reach = models.DecimalField(decimal_places=2, max_digits=4, null=True)
-    test_date = models.DateField()
-
-    class Meta:
-        unique_together = ("customer", "test_date")
-
-    def __str__(self):
-        return str(self.customer)
 
 
 class Category(models.Model):
@@ -71,17 +51,6 @@ class FitnessTest(models.Model):
     class Meta:
         verbose_name = "Fitness Test"
         verbose_name_plural = "Fitness Tests"
-
-
-class AgeBucketing(models.Model):
-    test_name = models.ForeignKey(FitnessTest, on_delete=models.CASCADE)
-    min_age = models.PositiveIntegerField(blank=True, null=True)
-    max_age = models.PositiveIntegerField(blank=True, null=True)
-
-    def __str__(self):
-        return (
-            str(self.test_name) + ": " + str(self.min_age) + " - " + str(self.max_age)
-        )
 
 
 class Gender(models.Model):
@@ -202,99 +171,8 @@ class WeightGenderPerformanceRating(models.Model):
         )
 
 
-class OneMileTestPerformance(models.Model):
-    test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
-    gender = models.ForeignKey(Gender, on_delete=models.PROTECT)
-    min_age = models.PositiveIntegerField(null=True)
-    max_age = models.PositiveIntegerField(null=True)
-    limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
-    performance = models.DecimalField(max_digits=3, decimal_places=1)
-    rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return str(self.test_name)
-
-
-class MaximumChestPressPerformance(models.Model):
-    test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
-    gender = models.ForeignKey(Gender, on_delete=models.PROTECT)
-    min_age = models.PositiveIntegerField(null=True)
-    max_age = models.PositiveIntegerField(null=True)
-    limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
-    performance = models.DecimalField(max_digits=5, decimal_places=2)
-    rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return str(self.test_name)
-
-
-class SixtySecSitUpTestPerformance(models.Model):
-    test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
-    gender = models.ForeignKey(Gender, on_delete=models.PROTECT)
-    min_age = models.PositiveIntegerField(null=True)
-    max_age = models.PositiveIntegerField(null=True)
-    limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
-    performance = models.DecimalField(max_digits=3, decimal_places=1)
-    rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return str(self.test_name)
-
-
-class ThePushUpTestPerformance(models.Model):
-    test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
-    gender = models.ForeignKey(Gender, on_delete=models.PROTECT)
-    min_age = models.PositiveIntegerField(null=True)
-    max_age = models.PositiveIntegerField(null=True)
-    limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
-    performance = models.DecimalField(max_digits=3, decimal_places=1)
-    rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return str(self.test_name)
-
-
-class SitAndReachTestPerformance(models.Model):
-    test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
-    gender = models.ForeignKey(Gender, on_delete=models.PROTECT)
-    min_age = models.PositiveIntegerField(null=True)
-    max_age = models.PositiveIntegerField(null=True)
-    limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
-    performance = models.DecimalField(max_digits=4, decimal_places=2)
-    rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return str(self.test_name)
-
-
-class WaistHipRatioTestPerformance(models.Model):
-    test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
-    gender = models.ForeignKey(Gender, on_delete=models.PROTECT)
-    min_age = models.PositiveIntegerField(null=True)
-    max_age = models.PositiveIntegerField(null=True)
-    limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
-    performance = models.DecimalField(max_digits=3, decimal_places=2)
-    rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return str(self.test_name)
-
-
 class BMITestPerformance(models.Model):
     test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
-    limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
-    performance = models.PositiveIntegerField()
-    rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return str(self.test_name)
-
-
-class BodyFatTestPerformance(models.Model):
-    test_name = models.ForeignKey(FitnessTest, on_delete=models.PROTECT)
-    gender = models.ForeignKey(Gender, on_delete=models.PROTECT)
-    min_age = models.PositiveIntegerField(null=True)
-    max_age = models.PositiveIntegerField(null=True)
     limit_type = models.ForeignKey(PerformanceLimit, on_delete=models.PROTECT)
     performance = models.PositiveIntegerField()
     rating = models.ForeignKey(PerformanceRatingScoring, on_delete=models.PROTECT)
@@ -313,25 +191,144 @@ class VisceralFatRatingTestPerformance(models.Model):
         return str(self.test_name)
 
 
-class TestPerformance(models.Model):
-    test_date = models.DateField()
+class TheOneMileTest(models.Model):
+    test_date = models.DateField(default=timezone.now)
     customer = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
-    test = models.ForeignKey(FitnessTest, on_delete=models.DO_NOTHING)
-    rating = models.CharField(max_length=50, null=True)
-    score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-
-    class Meta:
-        unique_together = ("customer", "test", "test_date")
+    age = models.PositiveIntegerField()
+    weight = models.PositiveIntegerField(verbose_name="Weight (kg)")
+    one_mile_time = models.DecimalField(decimal_places=2, max_digits=4)
+    exercise_heart_rate = models.DecimalField(decimal_places=2, max_digits=4)
+    oxygen_consumption = models.DecimalField(
+        decimal_places=2,
+        max_digits=4,
+        verbose_name="Maximal oxygen consumption",
+        blank=True,
+    )
+    rating = models.CharField(max_length=256, blank=True)
+    score = models.DecimalField(decimal_places=2, max_digits=4, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.test_date)
+        return self.__class__.__name__ + ": " + self.customer.user.username
 
 
-class PerformanceInput(models.Model):
+class MaximumChestPressTest(models.Model):
+    test_date = models.DateField(default=timezone.now)
     customer = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
-    test_id = models.ForeignKey(FitnessTest, on_delete=models.DO_NOTHING)
-    test_date = models.DateTimeField(auto_now=True)
-    performance = models.DecimalField(max_digits=5, decimal_places=2)
+    age = models.PositiveIntegerField()
+    weight = models.PositiveIntegerField(verbose_name="Body weight")
+    repetition_maximum = models.DecimalField(max_digits=5, decimal_places=2)
+    rating = models.CharField(max_length=256, blank=True)
+    score = models.DecimalField(decimal_places=2, max_digits=4, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.customer)
+        return self.__class__.__name__ + ": " + self.customer.user.username
+
+
+class SixtySecondSitUpTest(models.Model):
+    test_date = models.DateField(default=timezone.now)
+    customer = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
+    age = models.PositiveIntegerField()
+    no_of_situps = models.PositiveIntegerField()
+    rating = models.CharField(max_length=256, blank=True)
+    score = models.DecimalField(decimal_places=2, max_digits=4, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.__class__.__name__ + ": " + self.customer.user.username
+
+
+class ThePushUpTest(models.Model):
+    test_date = models.DateField(default=timezone.now)
+    customer = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
+    age = models.PositiveIntegerField()
+    no_of_push_ups = models.PositiveIntegerField(verbose_name="Number of push-ups")
+    rating = models.CharField(max_length=256, blank=True)
+    score = models.DecimalField(decimal_places=2, max_digits=4, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.__class__.__name__ + ": " + self.customer.user.username
+
+
+class SitAndReachTest(models.Model):
+    test_date = models.DateField(default=timezone.now)
+    customer = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
+    age = models.PositiveIntegerField()
+    reach_in_cm = models.DecimalField(decimal_places=2, max_digits=4)
+    rating = models.CharField(max_length=256, blank=True)
+    score = models.DecimalField(decimal_places=2, max_digits=4, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.__class__.__name__ + ": " + self.customer.user.username
+
+
+class WaistHipRatioTest(models.Model):
+    test_date = models.DateField(default=timezone.now)
+    customer = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
+    age = models.PositiveIntegerField()
+    waist_measurement = models.PositiveIntegerField()
+    hip_measurement = models.PositiveIntegerField()
+    waist_hip_ratio = models.DecimalField(decimal_places=2, max_digits=4, blank=True)
+    rating = models.CharField(max_length=256, blank=True)
+    score = models.DecimalField(decimal_places=2, max_digits=4, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.__class__.__name__ + ": " + self.customer.user.username
+
+
+class BMITest(models.Model):
+    test_date = models.DateField(default=timezone.now)
+    customer = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
+    height = models.PositiveIntegerField(verbose_name="Height (cm)")
+    weight = models.PositiveIntegerField(verbose_name="Weight (kg)")
+    bmi = models.DecimalField(
+        decimal_places=2, max_digits=5, blank=True, verbose_name="Body Mass Index"
+    )
+    rating = models.CharField(max_length=256, blank=True)
+    score = models.DecimalField(decimal_places=2, max_digits=4, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.__class__.__name__ + ": " + self.customer.user.username
+
+
+class BodyFatTest(models.Model):
+    test_date = models.DateField(default=timezone.now)
+    customer = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
+    age = models.PositiveIntegerField()
+    body_fat_percentage = models.PositiveIntegerField()
+    rating = models.CharField(max_length=256, blank=True)
+    score = models.DecimalField(decimal_places=2, max_digits=4, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.__class__.__name__ + ": " + self.customer.user.username
+
+
+class VisceralFatRatingTest(models.Model):
+    test_date = models.DateField(default=timezone.now)
+    customer = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
+    visceral_fat_rating = models.PositiveIntegerField()
+    rating = models.CharField(max_length=256, blank=True)
+    score = models.DecimalField(decimal_places=2, max_digits=4, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.__class__.__name__ + ": " + self.customer.user.username
+
+
+class MuscleMassTest(models.Model):
+    test_date = models.DateField(default=timezone.now)
+    customer = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
+    age = models.PositiveIntegerField()
+    muscle_mass_percentage = models.DecimalField(decimal_places=2, max_digits=4)
+    rating = models.CharField(max_length=256, blank=True)
+    score = models.DecimalField(decimal_places=2, max_digits=4, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.__class__.__name__ + ": " + self.customer.user.username

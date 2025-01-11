@@ -4,15 +4,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
 
-class UserProfileForm(forms.ModelForm):
-    user = forms.CharField(widget=forms.HiddenInput(), required=False)
-
-    class Meta:
-        model = UserProfile
-        user = forms.CharField(widget=forms.HiddenInput(), required=False)
-        fields = "__all__"
-
-
 class UserRegistrationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -25,82 +16,133 @@ class UserRegistrationForm(UserCreationForm):
         fields = ["username", "first_name", "last_name", "email"]
 
 
-class OneMileTestForm(forms.ModelForm):
-    class Meta:
-        model = TestInput
-        fields = ["customer", "weight_in_kg", "one_mile_time", "exercise_heart_rate"]
-        widgets = {"customer": forms.HiddenInput()}
-
-
-class ChestPressForm(forms.ModelForm):
+class UserProfileForm(forms.ModelForm):
 
     class Meta:
-        model = TestInput
-        fields = ["customer", "weight_in_kg", "repetition_maximum"]
-        widgets = {"customer": forms.HiddenInput()}
+        model = UserProfile
+        fields = "__all__"
+        widgets = {"user": forms.HiddenInput()}
 
 
-class SitupForm(forms.ModelForm):
-
-    class Meta:
-        model = TestInput
-        fields = ["customer", "no_of_situps"]
-        widgets = {"customer": forms.HiddenInput()}
-
-
-class PushupForm(forms.ModelForm):
+class TheOneMileTestForm(forms.ModelForm):
 
     class Meta:
-        model = TestInput
-        fields = ["customer", "no_of_push_ups"]
-        widgets = {"customer": forms.HiddenInput()}
+        model = TheOneMileTest
+        fields = "__all__"
+        widgets = {
+            "oxygen_consumption": forms.HiddenInput(),
+            "rating": forms.HiddenInput(),
+            "score": forms.HiddenInput(),
+            "customer": forms.HiddenInput(),
+            "test_date": forms.DateInput(attrs={"readonly": "readonly"}),
+        }
 
 
-class SitAndReachForm(forms.ModelForm):
-
-    class Meta:
-        model = TestInput
-        fields = ["customer", "sit_and_reach"]
-        widgets = {"customer": forms.HiddenInput()}
-
-
-class WaistHipRatioForm(forms.ModelForm):
+class MaximumChestPressTestForm(forms.ModelForm):
 
     class Meta:
-        model = TestInput
-        fields = ["customer", "waist_measurement", "hip_measurement"]
-        widgets = {"customer": forms.HiddenInput()}
+        model = MaximumChestPressTest
+        fields = "__all__"
+        widgets = {
+            "rating": forms.HiddenInput(),
+            "score": forms.HiddenInput(),
+            "customer": forms.HiddenInput(),
+        }
 
 
-class BMIForm(forms.ModelForm):
-
-    class Meta:
-        model = TestInput
-        fields = ["customer", "height_in_cm", "weight_in_kg"]
-        widgets = {"customer": forms.HiddenInput()}
-
-
-class VisceralFatForm(forms.ModelForm):
+class SixtySecondSitUpTestForm(forms.ModelForm):
 
     class Meta:
-        model = TestInput
-        fields = ["customer", "visceral_fat_rating"]
-        widgets = {"customer": forms.HiddenInput()}
+        model = SixtySecondSitUpTest
+        fields = "__all__"
+        widgets = {
+            "rating": forms.HiddenInput(),
+            "score": forms.HiddenInput(),
+            "customer": forms.HiddenInput(),
+        }
 
 
-class BodyFatForm(forms.ModelForm):
-
-    class Meta:
-        model = TestInput
-        fields = ["customer", "percentage_body_fat"]
-        widgets = {"customer": forms.HiddenInput()}
-
-
-class BoneMassForm(forms.ModelForm):
+class ThePushUpTestForm(forms.ModelForm):
 
     class Meta:
-        model = TestInput
-        fields = ["customer", "weight_in_kg", "bone_mass"]
-        widgets = {"customer": forms.HiddenInput()}
+        model = ThePushUpTest
+        fields = "__all__"
+        widgets = {
+            "rating": forms.HiddenInput(),
+            "score": forms.HiddenInput(),
+            "customer": forms.HiddenInput(),
+        }
 
 
+class SitAndReachTestForm(forms.ModelForm):
+
+    class Meta:
+        model = SitAndReachTest
+        fields = "__all__"
+        widgets = {
+            "rating": forms.HiddenInput(),
+            "score": forms.HiddenInput(),
+            "customer": forms.HiddenInput(),
+        }
+
+
+class WaistHipRatioTestForm(forms.ModelForm):
+
+    class Meta:
+        model = WaistHipRatioTest
+        fields = "__all__"
+        widgets = {
+            "waist_hip_ratio": forms.HiddenInput(),
+            "rating": forms.HiddenInput(),
+            "score": forms.HiddenInput(),
+            "customer": forms.HiddenInput(),
+        }
+
+
+class BMITestForm(forms.ModelForm):
+
+    class Meta:
+        model = BMITest
+        fields = "__all__"
+        widgets = {
+            "bmi": forms.HiddenInput(),
+            "rating": forms.HiddenInput(),
+            "score": forms.HiddenInput(),
+            "customer": forms.HiddenInput(),
+        }
+
+
+class BodyFatTestForm(forms.ModelForm):
+
+    class Meta:
+        model = BodyFatTest
+        fields = "__all__"
+        widgets = {
+            "rating": forms.HiddenInput(),
+            "score": forms.HiddenInput(),
+            "customer": forms.HiddenInput(),
+        }
+
+
+class VisceralFatRatingTestForm(forms.ModelForm):
+
+    class Meta:
+        model = VisceralFatRatingTest
+        fields = "__all__"
+        widgets = {
+            "rating": forms.HiddenInput(),
+            "score": forms.HiddenInput(),
+            "customer": forms.HiddenInput(),
+        }
+
+
+class MuscleMassTestForm(forms.ModelForm):
+
+    class Meta:
+        model = MuscleMassTest
+        fields = "__all__"
+        widgets = {
+            "rating": forms.HiddenInput(),
+            "score": forms.HiddenInput(),
+            "customer": forms.HiddenInput(),
+        }
