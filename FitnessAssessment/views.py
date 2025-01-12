@@ -134,6 +134,8 @@ def updateUserProfile(request, id):
 
 @login_required(login_url="login")
 def TheOneMileTestView(request):
+    tests = TheOneMileTest.objects.all()
+    print("tests: ", tests)
     test_name = "The One Mile Test"
     user = request.user
 
@@ -189,6 +191,7 @@ def TheOneMileTestView(request):
         form = TheOneMileTestForm(initial=initial_dict)
 
     context = {
+        "tests": tests,
         "form": form,
         "user": user,
         "user_profile": user_profile,

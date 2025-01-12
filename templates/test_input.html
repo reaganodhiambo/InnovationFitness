@@ -4,6 +4,13 @@
 {% block content %}
 {% load django_bootstrap5 %}
  <h3>{{ test_name }}</h3>
+ {% for test in tests %}
+   {% if test %}
+     {{test.test_date}}
+     <p>{{test.rating}}</p>
+     <p>{{test.score}}</p>
+   {% endif %}
+ {% endfor %}
 <form method="post" class="form">
     {% csrf_token %}
     {{form.as_p}}

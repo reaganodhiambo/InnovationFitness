@@ -1,14 +1,10 @@
 {% extends "base.html" %}
 {% block title %} Innovation Fitness | Home {% endblock %}
 {% block content %}
-
 <h2>Fitness Tests</h2>
 {% for key, value in test_urls.items %}
 <ul>
   <li><a href="{% url value %}" style=" text-decoration:underline;">{{ key }}</a></li>
 </ul>
 {% endfor %}
-
-
-
 {% endblock content %}
