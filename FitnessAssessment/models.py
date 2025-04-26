@@ -197,7 +197,7 @@ class TheOneMileTest(models.Model):
     age = models.PositiveIntegerField()
     weight = models.PositiveIntegerField(verbose_name="Weight (kg)")
     one_mile_time = models.DecimalField(decimal_places=2, max_digits=4)
-    exercise_heart_rate = models.DecimalField(decimal_places=2, max_digits=4)
+    exercise_heart_rate = models.DecimalField(decimal_places=2, max_digits=5)
     oxygen_consumption = models.DecimalField(
         decimal_places=2,
         max_digits=4,

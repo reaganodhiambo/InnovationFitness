@@ -180,7 +180,8 @@ def TheOneMileTestView(request):
 
             return redirect(request.path)
         else:
-            return HttpResponse("Form is not valid")
+            error_message = form.errors.as_json()
+            return HttpResponse(f"Form is not valid: {error_message}", content_type="application/json")
     else:
         initial_dict = {
             "customer": user_profile,
@@ -567,6 +568,7 @@ def VisceralFatTestView(request):
         form = VisceralFatRatingTestForm(initial=initial_dict)
 
     context = {
+        "tests": tests,
         "form": form,
         "user": user,
         "user_profile": user_profile,
