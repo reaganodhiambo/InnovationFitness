@@ -26,3 +26,24 @@
     </div>
 </div>
 {% endblock %}
+
+
+
+{% block title %} Innovation Fitness | Home {% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Fitness Tests</h2>
+    <div class="row justify-content-center">
+        {% for key, value in test_urls.items %}
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ key }}</h5>
+                    <a href="{% url value %}" class="btn btn-primary mt-2">Take Test</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

@@ -71,7 +71,7 @@ def loginUser(request):
                 user_profile = None
 
             if not user_profile:
-                return redirect("update-profile", user.id)
+                return redirect("update_user_profile", user.id)
             else:
                 return redirect("home")
         else:
@@ -134,10 +134,10 @@ def updateUserProfile(request, id):
 
 @login_required(login_url="login")
 def TheOneMileTestView(request):
-    tests = TheOneMileTest.objects.all()
+    user = request.user
+    tests = TheOneMileTest.objects.filter(customer__user=user)
     print("tests: ", tests)
     test_name = "The One Mile Test"
-    user = request.user
 
     try:
         user_profile = UserProfile.objects.get(user_id=user.id)
@@ -178,7 +178,7 @@ def TheOneMileTestView(request):
 
             initial_obj.save()
 
-            return redirect("home")
+            return redirect(request.path)
         else:
             return HttpResponse("Form is not valid")
     else:
@@ -204,6 +204,7 @@ def TheOneMileTestView(request):
 def MaximumChestPressTestView(request):
     test_name = "Maximum Chest Press Test"
     user = request.user
+    tests = MaximumChestPressTest.objects.filter(customer__user=user)
     try:
         user_profile = UserProfile.objects.get(user=user)
     except:
@@ -233,7 +234,7 @@ def MaximumChestPressTestView(request):
 
             initial_obj.save()
 
-            return redirect("home")
+            return redirect(request.path)
         else:
             return HttpResponse("Form is not valid")
     else:
@@ -247,6 +248,7 @@ def MaximumChestPressTestView(request):
 
     context = {
         "form": form,
+        "tests": tests,
         "user": user,
         "user_profile": user_profile,
         "test_name": test_name,
@@ -258,6 +260,7 @@ def MaximumChestPressTestView(request):
 def SixtySecondSitUpTestView(request):
     test_name = "The 60 Second Sit-up Test"
     user = request.user
+    tests = SixtySecondSitUpTest.objects.filter(customer__user=user)
     try:
         user_profile = UserProfile.objects.get(user=user)
     except:
@@ -286,7 +289,7 @@ def SixtySecondSitUpTestView(request):
 
             initial_obj.save()
 
-            return redirect("home")
+            return redirect(request.path)
         else:
             return HttpResponse("Form is not valid")
     else:
@@ -298,6 +301,7 @@ def SixtySecondSitUpTestView(request):
 
     context = {
         "form": form,
+        "tests": tests,
         "user": user,
         "user_profile": user_profile,
         "test_name": test_name,
@@ -309,6 +313,7 @@ def SixtySecondSitUpTestView(request):
 def ThePushUpTestView(request):
     test_name = "The Push-up Test"
     user = request.user
+    tests = ThePushUpTest.objects.filter(customer__user=user)
     try:
         user_profile = UserProfile.objects.get(user=user)
     except:
@@ -337,7 +342,7 @@ def ThePushUpTestView(request):
 
             initial_obj.save()
 
-            return redirect("home")
+            return redirect(request.path)
         else:
             return HttpResponse("Form is not valid")
     else:
@@ -348,6 +353,7 @@ def ThePushUpTestView(request):
         form = ThePushUpTestForm(initial=initial_dict)
 
     context = {
+        "tests": tests,
         "form": form,
         "user": user,
         "user_profile": user_profile,
@@ -360,6 +366,7 @@ def ThePushUpTestView(request):
 def SitAndReachTestView(request):
     test_name = "Sit-and-Reach Test"
     user = request.user
+    tests = SitAndReachTest.objects.filter(customer__user=user)
     try:
         user_profile = UserProfile.objects.get(user=user)
     except:
@@ -388,7 +395,7 @@ def SitAndReachTestView(request):
 
             initial_obj.save()
 
-            return redirect("home")
+            return redirect(request.path)
         else:
             return HttpResponse("Form is not valid")
     else:
@@ -399,6 +406,7 @@ def SitAndReachTestView(request):
         form = SitAndReachTestForm(initial=initial_dict)
 
     context = {
+        "tests": tests,
         "form": form,
         "user": user,
         "user_profile": user_profile,
@@ -411,6 +419,7 @@ def SitAndReachTestView(request):
 def WaistHipRatioTestView(request):
     test_name = "Waist Hip Ratio"
     user = request.user
+    tests = WaistHipRatioTest.objects.filter(customer__user=user)
     try:
         user_profile = UserProfile.objects.get(user=user)
     except:
@@ -443,7 +452,7 @@ def WaistHipRatioTestView(request):
 
             initial_obj.save()
 
-            return redirect("home")
+            return redirect(request.path)
         else:
             return HttpResponse("Form is not valid")
     else:
@@ -454,6 +463,7 @@ def WaistHipRatioTestView(request):
         form = WaistHipRatioTestForm(initial=initial_dict)
 
     context = {
+        "tests": tests,
         "form": form,
         "user": user,
         "user_profile": user_profile,
@@ -466,6 +476,7 @@ def WaistHipRatioTestView(request):
 def BMITestView(request):
     test_name = "Body Mass Index"
     user = request.user
+    tests = BMITest.objects.filter(customer__user=user)
 
     try:
         user_profile = UserProfile.objects.get(user=user)
@@ -495,7 +506,7 @@ def BMITestView(request):
             print("initial_obj: ", initial_obj)
             initial_obj.save()
 
-            return redirect("home")
+            return redirect(request.path)
         else:
             return HttpResponse("Form is not valid")
     else:
@@ -508,6 +519,7 @@ def BMITestView(request):
         form = BMITestForm(initial=initial_dict)
 
     context = {
+        "tests": tests,
         "form": form,
         "user": user,
         "user_profile": user_profile,
@@ -520,6 +532,7 @@ def BMITestView(request):
 def VisceralFatTestView(request):
     test_name = "Visceral Fat Rating"
     user = request.user
+    tests = VisceralFatRatingTest.objects.filter(customer__user=user)
 
     try:
         user_profile = UserProfile.objects.get(user=user)
@@ -544,7 +557,7 @@ def VisceralFatTestView(request):
             print("initial_obj: ", initial_obj)
             initial_obj.save()
 
-            return redirect("home")
+            return redirect(request.path)
         else:
             return HttpResponse("Form is not valid")
     else:
@@ -564,6 +577,8 @@ def VisceralFatTestView(request):
 
 @login_required(login_url="login")
 def situpTest(request):
+    user = request.user
+    tests = SixtySecSitUpTest.objects.filter(customer__user=user)
     test_model = SixtySecSitUpTestPerformance.objects.all()[0]
     if request.method == "POST":
         form = SitupForm(request.POST)
@@ -601,7 +616,7 @@ def situpTest(request):
                 score=scoring["user_score"],
                 test_date=datetime.date.today(),
             )
-            return redirect("home")
+            return redirect(request.path)
     else:
         user_profile = UserProfile.objects.get(user=request.user.id)
         initial_dict = {
@@ -609,12 +624,14 @@ def situpTest(request):
             "no_of_situps": None,
         }
         form = SitupForm(initial=initial_dict)
-    context = {"form": form, "test_name": test_model.test_name}
+    context = {"form": form, "test_name": test_model.test_name, "tests": tests}
     return render(request, "test_input.html", context=context)
 
 
 @login_required(login_url="login")
 def pushupTest(request):
+    user = request.user
+    tests = ThePushUpTest.objects.filter(customer__user=user)
     test_model = ThePushUpTestPerformance.objects.all()[0]
     if request.method == "POST":
         form = PushupForm(request.POST)
@@ -653,7 +670,7 @@ def pushupTest(request):
                 score=scoring["user_score"],
                 test_date=datetime.date.today(),
             )
-            return redirect("home")
+            return redirect(request.path)
     else:
         user_profile = UserProfile.objects.get(user=request.user.id)
         initial_dict = {
@@ -661,7 +678,7 @@ def pushupTest(request):
             "no_of_push_ups": None,
         }
         form = PushupForm(initial=initial_dict)
-    context = {"form": form, "test_name": test_model.test_name}
+    context = {"form": form, "test_name": test_model.test_name, "tests": tests}
     return render(request, "test_input.html", context=context)
 
 
@@ -670,6 +687,8 @@ def pushupTest(request):
 
 @login_required(login_url="login")
 def sitAndReachTest(request):
+    user = request.user
+    tests = SitAndReachTest.objects.filter(customer__user=user)
     test_model = SitAndReachTestPerformance.objects.all()[0]
     if request.method == "POST":
         form = SitAndReachForm(request.POST)
@@ -707,7 +726,7 @@ def sitAndReachTest(request):
                 score=scoring["user_score"],
                 test_date=datetime.date.today(),
             )
-            return redirect("home")
+            return redirect(request.path)
     else:
         user_profile = UserProfile.objects.get(user=request.user.id)
         initial_dict = {
@@ -715,7 +734,7 @@ def sitAndReachTest(request):
             "sit_and_reach": None,
         }
         form = SitAndReachForm(initial=initial_dict)
-    context = {"form": form, "test_name": test_model.test_name}
+    context = {"form": form, "test_name": test_model.test_name, "tests": tests}
     return render(request, "test_input.html", context=context)
 
 
@@ -723,6 +742,7 @@ def sitAndReachTest(request):
 def BoneMassTestView(request):
     test_name = "Bone Mass"
     user = request.user
+    tests = BoneMassTest.objects.filter(customer__user=user)
     try:
         user_profile = UserProfile.objects.get(user=user)
     except:
@@ -751,7 +771,7 @@ def BoneMassTestView(request):
 
             initial_obj.save()
 
-            return redirect("home")
+            return redirect(request.path)
         # else:
         #     return HttpResponse("Form is not valid")
     else:
@@ -762,6 +782,7 @@ def BoneMassTestView(request):
         form = BoneMassTestForm(initial=initial_dict)
 
     context = {
+        "tests": tests,
         "form": form,
         "user": user,
         "user_profile": user_profile,
@@ -773,6 +794,7 @@ def BoneMassTestView(request):
 def BodyFatTestView(request):
     test_name = "Body Fat"
     user = request.user
+    tests = BodyFatTest.objects.filter(customer__user=user)
 
     try:
         user_profile = UserProfile.objects.get(user_id=user.id)
@@ -803,7 +825,7 @@ def BodyFatTestView(request):
 
             initial_obj.save()
 
-            return redirect("home")
+            return redirect(request.path)
         else:
             return HttpResponse("Form is not valid")
     else:
@@ -818,5 +840,42 @@ def BodyFatTestView(request):
         "user": user,
         "user_profile": user_profile,
         "test_name": test_name,
+        "tests": tests,
     }
     return render(request, "test_input.html", context=context)
+
+
+@login_required(login_url="login")
+def latestTestResultsView(request):
+    user = request.user
+    try:
+        user_profile = UserProfile.objects.get(user=user)
+    except UserProfile.DoesNotExist:
+        return redirect("update_user_profile", user.id)
+
+    latest_results = {}
+
+    test_models = [
+        TheOneMileTest,
+        MaximumChestPressTest,
+        SixtySecondSitUpTest,
+        ThePushUpTest,
+        SitAndReachTest,
+        WaistHipRatioTest,
+        BMITest,
+        VisceralFatRatingTest,
+        BoneMassTest,
+        BodyFatTest,
+    ]
+
+    for model in test_models:
+        latest_result = model.objects.filter(customer__user=user).order_by("-test_date").first()
+        if latest_result:
+            latest_results[model._meta.verbose_name] = latest_result
+
+    context = {
+        "latest_results": latest_results,
+        "user": user,
+        "user_profile": user_profile,
+    }
+    return render(request, "latest_results.html", context=context)

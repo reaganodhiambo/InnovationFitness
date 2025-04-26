@@ -1,20 +1,70 @@
 {% extends "base.html" %}
 {% block title %}{{ test_name }}{% endblock title %}
+{% load widget_tweaks %}
 
 {% block content %}
-{% load django_bootstrap5 %}
- <h3>{{ test_name }}</h3>
- {% for test in tests %}
-   {% if test %}
-     {{test.test_date}}
-     <p>{{test.rating}}</p>
-     <p>{{test.score}}</p>
-   {% endif %}
- {% endfor %}
-<form method="post" class="form">
-    {% csrf_token %}
-    {{form.as_p}}
-    <button type="submit">Submit</button>
-</form>
-<a href="{% url 'home' %}">Back to tests</a>
+<div class="container mt-5">
+  <div class="row">
+    <!-- Left Side: Input Form -->
+    <div class="col-md-6">
+      <h3 class="text-center mb-4">{{ test_name }}</h3>
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <form method="post" class="form">
+            {% csrf_token %}
+            <div class="mb-3">
+              {% for field in form %}
+              {% if not field.is_hidden %}
+              <div class="form-group mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label d-block">{{ field.label }}</label>
+                {{ field|add_class:"form-control" }}
+                {% if field.help_text %}
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+              </div>
+              {% else %}
+              {{ field }}
+              {% endif %}
+              {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-success w-100">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side: Tests Taken -->
+    <div class="col-md-6">
+      <h3 class="text-center mb-4">Tests Taken</h3>
+      {% if tests %}
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Test Date</th>
+                <th>Rating</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for test in tests %}
+              <tr>
+                <td>{{ test.test_date }}</td>
+                <td>{{ test.rating }}</td>
+                <td>{{ test.score }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% else %}
+      <div class="alert alert-warning text-center" role="alert">
+        No tests have been taken yet.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 {% endblock content %}

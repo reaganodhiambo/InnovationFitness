@@ -1,6 +1,16 @@
-<h1>{{ test.test_name }} </h1>
-<form method="post">    
-    {% csrf_token %}
-    {{form.as_p}}
-    <button type="submit">Add {{test.test_name}}</button>
-</form>
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white text-center">
+            <h2>{{ test.test_name }}</h2>
+        </div>
+        <div class="card-body">
+            <form method="post" class="p-3">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" class="btn btn-success w-100">Add {{ test.test_name }}</button>
+            </form>
+        </div>
+    </div>
+</div>

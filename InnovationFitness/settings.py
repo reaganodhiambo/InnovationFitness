@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     "FitnessAssessment",
     "django_bootstrap5",
+    "widget_tweaks",
 ]
 
 MIDDLEWARE = [

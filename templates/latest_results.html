@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Latest Test Results{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Latest Test Results</h2>
+
+    <!-- User Details -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title">User Details</h4>
+            <p><strong>Name:</strong> {{ user.get_full_name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Age:</strong> {{ user_profile.age }}</p>
+            <p><strong>Gender:</strong> {{ user_profile.gender }}</p>
+        </div>
+    </div>
+
+    <!-- Test Results -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if latest_results %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Test Name</th>
+                        <th>Test Date</th>
+                        <th>Rating</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for test_name, result in latest_results.items %}
+                    <tr>
+                        <td>{{ test_name }}</td>
+                        <td>{{ result.test_date }}</td>
+                        <td>{{ result.rating }}</td>
+                        <td>{{ result.score }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="alert alert-warning text-center" role="alert">
+                No test results available.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="text-center mt-3">
+        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+    </div>
+</div>
+{% endblock content %}

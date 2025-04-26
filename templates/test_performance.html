@@ -1,17 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1>{{user.username|title}}'s test perfomance</h1>
-  <a href="{% url 'home' %}">Back home</a>
-    {% if test_perf|length < 1%}
-      <p>No test results exist</p>
-      <button onclick="window.history.back()">Back</button>
-    {% else %}
-      {% for test in test_perf %}
-        <h4>{{test.test_name}}</h4>
-        <p>Test Date: {{test.test_date|date:"F j, Y"}}</p>
-        <p>Score: {{test.score}}</p>
-        <p>Rating: {{test.rating}}</p>
-        <hr>
-      {% endfor %}
-    {% endif %}
+<div class="container mt-5">
+  <h1 class="text-center mb-4">{{ user.username|title }}'s Test Performance</h1>
+  <div class="text-center mb-3">
+    <a href="{% url 'home' %}" class="btn btn-secondary">Back Home</a>
+  </div>
+  {% if test_perf|length < 1 %} <div class="alert alert-warning text-center" role="alert">
+    <p>No test results exist</p>
+    <button onclick="window.history.back()" class="btn btn-primary mt-2">Go Back</button>
+</div>
+{% else %}
+<div class="row">
+  {% for test in test_perf %}
+  <div class="col-md-6 mb-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h4 class="card-title">{{ test.test_name }}</h4>
+      </div>
+      <div class="card-body">
+        <p><strong>Test Date:</strong> {{ test.test_date|date:"F j, Y" }}</p>
+        <p><strong>Score:</strong> {{ test.score }}</p>
+        <p><strong>Rating:</strong> {{ test.rating }}</p>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+</div>
 {% endblock content %}
