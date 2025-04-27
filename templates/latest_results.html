@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Latest Test Results</h2>
+    
 
     <!-- User Details -->
     <div class="card mb-4 shadow-sm">
@@ -17,29 +17,32 @@
     </div>
 
     <!-- Test Results -->
+    <h2 class="text-center mb-4 mt-4">Latest Test Results</h2>
     <div class="card shadow-sm">
         <div class="card-body">
             {% if latest_results %}
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Test Name</th>
-                        <th>Test Date</th>
-                        <th>Rating</th>
-                        <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for test_name, result in latest_results.items %}
-                    <tr>
-                        <td>{{ test_name }}</td>
-                        <td>{{ result.test_date }}</td>
-                        <td>{{ result.rating }}</td>
-                        <td>{{ result.score }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Test Name</th>
+                            <th>Test Date</th>
+                            <th>Rating</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for test_name, result in latest_results.items %}
+                        <tr>
+                            <td>{{ test_name }}</td>
+                            <td>{{ result.test_date }}</td>
+                            <td>{{ result.rating }}</td>
+                            <td>{{ result.score }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             {% else %}
             <div class="alert alert-warning text-center" role="alert">
                 No test results available.
@@ -49,7 +52,8 @@
     </div>
 
     <div class="text-center mt-3">
-        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Home</a>
+        <a href="#" class="btn btn-primary">Take a New Test</a>
     </div>
 </div>
 {% endblock content %}

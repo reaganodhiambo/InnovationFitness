@@ -134,6 +134,18 @@ def updateUserProfile(request, id):
 
 @login_required(login_url="login")
 def TheOneMileTestView(request):
+    test_urls = {
+        "The One Mile Test": "one-mile-test",
+        "Maximum Chest Press Test": "chest-press-test",
+        "The 60 Second Sit-up Test": "sit-up-test",
+        "The Push-up Test": "push-up-test",
+        "Sit-and-Reach Test": "sit-and-reach-test",
+        "Waist Hip Ratio": "waist-hip-ratio-test",
+        "Body Mass Index": "bmi-test",
+        "Body Fat": "body-fat-test",
+        "Visceral Fat Rating": "visceral-fat-test",
+        "Bone Mass": "bone-mass-test",
+    }
     user = request.user
     tests = TheOneMileTest.objects.filter(customer__user=user)
     print("tests: ", tests)
@@ -181,7 +193,9 @@ def TheOneMileTestView(request):
             return redirect(request.path)
         else:
             error_message = form.errors.as_json()
-            return HttpResponse(f"Form is not valid: {error_message}", content_type="application/json")
+            return HttpResponse(
+                f"Form is not valid: {error_message}", content_type="application/json"
+            )
     else:
         initial_dict = {
             "customer": user_profile,
@@ -192,6 +206,7 @@ def TheOneMileTestView(request):
         form = TheOneMileTestForm(initial=initial_dict)
 
     context = {
+        # "test_urls": test_urls,
         "tests": tests,
         "form": form,
         "user": user,
@@ -203,6 +218,18 @@ def TheOneMileTestView(request):
 
 @login_required(login_url="login")
 def MaximumChestPressTestView(request):
+    test_urls = {
+    "The One Mile Test": "one-mile-test",
+    "Maximum Chest Press Test": "chest-press-test",
+    "The 60 Second Sit-up Test": "sit-up-test",
+    "The Push-up Test": "push-up-test",
+    "Sit-and-Reach Test": "sit-and-reach-test",
+    "Waist Hip Ratio": "waist-hip-ratio-test",
+    "Body Mass Index": "bmi-test",
+    "Body Fat": "body-fat-test",
+    "Visceral Fat Rating": "visceral-fat-test",
+    "Bone Mass": "bone-mass-test",
+}
     test_name = "Maximum Chest Press Test"
     user = request.user
     tests = MaximumChestPressTest.objects.filter(customer__user=user)
@@ -248,6 +275,7 @@ def MaximumChestPressTestView(request):
         form = MaximumChestPressTestForm(initial=initial_dict)
 
     context = {
+        # "test_urls": test_urls,
         "form": form,
         "tests": tests,
         "user": user,
@@ -871,7 +899,9 @@ def latestTestResultsView(request):
     ]
 
     for model in test_models:
-        latest_result = model.objects.filter(customer__user=user).order_by("-test_date").first()
+        latest_result = (
+            model.objects.filter(customer__user=user).order_by("test_date").first()
+        )
         if latest_result:
             latest_results[model._meta.verbose_name] = latest_result
 

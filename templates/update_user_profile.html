@@ -1,18 +1,48 @@
 {% extends "base.html" %}
 {% block content %}
-{% load django_bootstrap5 %}
-<h1>Update Profile</h1>
-<p>Hello {{user.username}} </p>
+{% load widget_tweaks %}
 
-<form method="post">
-    {% csrf_token %}
-    {{form.as_p}}
-    {% bootstrap_button "Save Changes" button_type="submit" button_class="btn-primary" %}
-</form>
-{% if not user_profile %}
-        <a href="{% url "logout" %}">Logout</a>
-    {% else %}
-    <button onclick="window.history.back()" class="btn btn-info">Cancel</button>
-    {% endif %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="text-center mb-4">Update Profile</h2>
+                    <p class="text-center">Hello, <strong>{{ user.username }}</strong></p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {% for field in form %}
+                            {% if not field.is_hidden %}
+                            <div class="form-group mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label d-block">{{ field.label }}</label>
+                                {{ field|add_class:"form-control" }}
+                                {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            {{ field }}
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success w-100">Save Changes</button>
+                        </div>
+                    </form>
+                    {% if not user_profile %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'logout' %}" class="btn btn-danger w-100">Logout</a>
+                    </div>
+                    {% else %}
+                    <div class="text-center mt-3">
+                        <button onclick="window.history.back()" class="btn btn-secondary w-100">Cancel</button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
-
