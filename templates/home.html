@@ -3,20 +3,21 @@
 {% block content %}
 <div class="container-fluid p-0 max-vw-100">
   <div class="row">
-    <!-- Sidebar -->
     <div class="col-md-3 bg-light border-end vh-100" id="sidebar">
       <h4 class="text-center mt-3">Fitness Tests</h4>
       <ul class="list-group">
         {% for key, value in test_urls.items %}
-        <li class="list-group-item list-group-item-action" onclick="loadTest('{{ key }}', '{% url value %}')">
+
+        <li class="list-group-item list-group-item-action " onclick="loadTest('{{ key }}', '{% url value %}')">
           {{ key }}
         </li>
         {% endfor %}
       </ul>
     </div>
 
-    <!-- Main Content -->
     <div class="col-md-9" id="main-content">
+
+      
       <div class="text-center mt-5">
         <h3>Select a test from the sidebar</h3>
       </div>
