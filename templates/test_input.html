@@ -3,82 +3,118 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="container-fluid ">
-  <div class="row">
-    <!-- Input Form -->
-    <div class="col-md-3 bg-light border-end vh-100 vh-sm-50" id="sidebar">
-      <h4 class="text-center mt-3">Fitness Tests</h4>
+<div class="container-fluid">
+  <div class="row d-flex justify-content-between align-items-start">
+    <!-- Sidebar -->
+    <div class="col-md-3 bg-light border-end" id="sidebar">
+      <h4 class="text-center mt-4 mb-4">Fitness Tests</h4>
       <ul class="list-group">
-      {% for key, value in test_urls.items %}
-      <a href="{% url value %}" class="text-decoration-none"><li class="list-group-item list-group-item-action " onclick="loadTest('{{ key }}', '{% url value %}')">
-        {{ key }}
-      </li>
-      </a>
-      {% endfor %}
+        {% for key, value in test_urls.items %}
+        <a href="{% url value %}" class="text-decoration-none">
+          <li class="list-group-item list-group-item-action">
+            {{ key }}
+          </li>
+        </a>
+        {% endfor %}
       </ul>
     </div>
-    
-    <div class="col-md-9" id="main-content">
-    <div class="col-md-9">
-      <h3 class="text-center mb-4 mt-4">{{ test_name }}</h3>
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <form method="post" class="form">
-            {% csrf_token %}
-            <div class="mb-3">
-              {% for field in form %}
-              {% if not field.is_hidden %}
-              <div class="form-group mb-3">
-                <label for="{{ field.id_for_label }}" class="form-label d-block">{{ field.label }}</label>
-                {{ field|add_class:"form-control" }}
-                {% if field.help_text %}
-                <small class="form-text text-muted">{{ field.help_text }}</small>
-                {% endif %}
-              </div>
-              {% else %}
-              {{ field }}
-              {% endif %}
-              {% endfor %}
-            </div>
-            <button type="submit" class="btn btn-success w-100">Submit</button>
-          </form>
-        </div>
-      </div>
-    </div>
 
-    <!--  Tests Taken -->
-    <div class="col-md-9">
-      <h3 class="text-center mb-4">Tests Taken</h3>
-      {% if tests %}
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Test Date</th>
-                <th>Rating</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for test in tests %}
-              <tr>
-                <td>{{ test.test_date }}</td>
-                <td>{{ test.rating }}</td>
-                <td>{{ test.score }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+    <!-- Main Content -->
+    <div class="col-md-9" id="main-content">
+      {% if not form %}
+      <div class="text-center mt-5">
+        <h2>Select a test from the sidebar</h2>
+      </div>
+      <div class="container mt-5">
+        <h2 class="text-center mb-4">Fitness Tests</h2>
+        <div class="row justify-content-center">
+          {% for key, value in test_urls.items %}
+          <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <h5 class="card-title">{{ key }}</h5>
+                <a href="{% url value %}" class="btn btn-primary mt-2">Take Test</a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
         </div>
       </div>
       {% else %}
-      <div class="alert alert-warning text-center" role="alert">
-        No tests have been taken yet.
+      <div class="col-md-9">
+        <h3 class="text-center mb-4 mt-4">{{ test_name }}</h3>
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <form method="post" class="form">
+              {% csrf_token %}
+              <div class="mb-3">
+                {% for field in form %}
+                {% if not field.is_hidden %}
+                <div class="form-group mb-3">
+                  <label for="{{ field.id_for_label }}" class="form-label d-block">{{ field.label }}</label>
+                  {{ field|add_class:"form-control" }}
+                  {% if field.help_text %}
+                  <small class="form-text text-muted">{{ field.help_text }}</small>
+                  {% endif %}
+                </div>
+                {% else %}
+                {{ field }}
+                {% endif %}
+                {% endfor %}
+              </div>
+              <button type="submit" class="btn btn-success w-100">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tests Taken -->
+      <div class="col-md-9">
+        <h3 class="text-center mb-4">Tests Taken</h3>
+        {% if tests %}
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Test Date</th>
+                  <th>Rating</th>
+                  <th>Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for test in tests %}
+                <tr>
+                  <td>{{ test.test_date }}</td>
+                  <td>{{ test.rating }}</td>
+                  <td>{{ test.score }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {% else %}
+        <div class="alert alert-warning text-center" role="alert">
+          No tests have been taken yet.
+        </div>
+        {% endif %}
+        <a href="{% url 'latest-results' %}" class="btn btn-secondary w-100 mt-3">Test Summary</a>
       </div>
       {% endif %}
-      <a href="{% url 'latest-results' %}" class="btn btn-secondary w-100 mt-3">Test Summary</a>
     </div>
   </div>
 </div>
+
+<style>
+  #sidebar {
+    height: 100vh;
+  }
+
+  @media (max-width: 768px) {
+    #sidebar {
+      height: auto;
+    }
+  }
+</style>
 {% endblock content %}

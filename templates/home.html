@@ -2,38 +2,60 @@
 {% block title %} Innovation Fitness | Home {% endblock %}
 {% block content %}
 <div class="container-fluid p-0 max-vw-100">
-  <div class="row">
-    <div class="col-md-3 bg-light border-end vh-100" id="sidebar">
-      <h4 class="text-center mt-3">Fitness Tests</h4>
-      <ul class="list-group">
-        {% for key, value in test_urls.items %}
-
-        <li class="list-group-item list-group-item-action " onclick="loadTest('{{ key }}', '{% url value %}')">
-          {{ key }}
-        </li>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <div class="col-md-9" id="main-content">
-
-      
-      <div class="text-center mt-5">
-        <h3>Select a test from the sidebar</h3>
+  <div class="container mt-5">
+  
+    <!-- User Details -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body">
+        <h4 class="card-title">User Details</h4>
+        <p><strong>Name:</strong> {{ user.get_full_name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Age:</strong> {{ user_profile.age }}</p>
+        <p><strong>Gender:</strong> {{ user_profile.gender }}</p>
       </div>
+    </div>
+  
+    <!-- Test Results -->
+    <h2 class="text-center mb-4 mt-4">Latest Test Results</h2>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        {% if latest_results %}
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Test Name</th>
+                <th>Test Date</th>
+                <th>Rating</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for test_name, result in latest_results.items %}
+              <tr>
+                <td>{{ test_name }}</td>
+                <td>{{ result.test_date }}</td>
+                <td>{{ result.rating }}</td>
+                <td>{{ result.score }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="alert alert-warning text-center" role="alert">
+          No test results available. Click below to take a test.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  
+    <div class="text-center mt-3">
+      <a href="{% url 'edit_user_profile' user.id %}" class="btn btn-secondary" id="update-profile-btn">Update Profile</a>
+      <a href="{% url 'test-guide' %}" class="btn btn-primary">Take a Test</a>
     </div>
   </div>
 </div>
 
-<script>
-  function loadTest(testName, testUrl) {
-    const mainContent = document.getElementById('main-content');
-    mainContent.innerHTML = `
-      <div class="text-center mt-5">
-        <h3>${testName}</h3>
-        <a href="${testUrl}" class="btn btn-primary mt-3">Take Test</a>
-      </div>
-    `;
-  }
-</script>
+
 {% endblock content %}

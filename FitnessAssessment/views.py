@@ -25,20 +25,33 @@ def index(request):
     except:
         return redirect("update_user_profile", user.id)
 
-    test_urls = {
-        "The One Mile Test": "one-mile-test",
-        "Maximum Chest Press Test": "chest-press-test",
-        "The 60 Second Sit-up Test": "sit-up-test",
-        "The Push-up Test": "push-up-test",
-        "Sit-and-Reach Test": "sit-and-reach-test",
-        "Waist Hip Ratio": "waist-hip-ratio-test",
-        "Body Mass Index": "bmi-test",
-        "Body Fat": "body-fat-test",
-        "Visceral Fat Rating": "visceral-fat-test",
-        "Bone Mass": "bone-mass-test",
-    }
+    latest_results = {}
 
-    context = {"test_urls": test_urls, "user": user}
+    test_models = [
+        TheOneMileTest,
+        MaximumChestPressTest,
+        SixtySecondSitUpTest,
+        ThePushUpTest,
+        SitAndReachTest,
+        WaistHipRatioTest,
+        BMITest,
+        VisceralFatRatingTest,
+        BoneMassTest,
+        BodyFatTest,
+    ]
+
+    for model in test_models:
+        latest_result = (
+            model.objects.filter(customer__user=user).order_by("test_date").first()
+        )
+        if latest_result:
+            latest_results[model._meta.verbose_name] = latest_result
+
+    context = {
+        "user": user,
+        "user_profile": user_profile,
+        "latest_results": latest_results,
+    }
     return render(request, "home.html", context=context)
 
 
@@ -131,21 +144,45 @@ def updateUserProfile(request, id):
     context = {"form": form, "user": user, "user_profile": user_profile}
     return render(request, "update_user_profile.html", context=context)
 
+@login_required(login_url="login")
+def editUserProfile(request, id):
+    user = User.objects.get(id=id)
+
+    if request.user.id == user.id:
+        try:
+            user_profile = UserProfile.objects.get(user_id=id)
+        except:
+            user_profile = None
+
+        if request.method == "POST":
+            form = UserProfileForm(
+                request.POST,
+                instance=user_profile,
+            )
+
+            if form.is_valid():
+                updated_form = form.save(commit=False)
+                updated_form.user_id = user.id
+                updated_form.save()
+                return redirect("home")
+            else:
+                return HttpResponse("Form is not valid")
+        else:
+            if user_profile is not None:
+                form = UserProfileForm(instance=user_profile)
+            else:
+                initial_dict = {"user": user}
+                form = UserProfileForm(initial=initial_dict)
+    else:
+        messages.error(request, "You are not authorized to update this user's profile")
+        return redirect(request.path_info)
+
+    context = {"form": form, "user": user, "user_profile": user_profile}
+    return render(request, "update_user_profile.html", context=context)
 
 @login_required(login_url="login")
 def TheOneMileTestView(request):
-    test_urls = {
-        "The One Mile Test": "one-mile-test",
-        "Maximum Chest Press Test": "chest-press-test",
-        "The 60 Second Sit-up Test": "sit-up-test",
-        "The Push-up Test": "push-up-test",
-        "Sit-and-Reach Test": "sit-and-reach-test",
-        "Waist Hip Ratio": "waist-hip-ratio-test",
-        "Body Mass Index": "bmi-test",
-        "Body Fat": "body-fat-test",
-        "Visceral Fat Rating": "visceral-fat-test",
-        "Bone Mass": "bone-mass-test",
-    }
+   
     user = request.user
     tests = TheOneMileTest.objects.filter(customer__user=user)
     print("tests: ", tests)
@@ -206,7 +243,6 @@ def TheOneMileTestView(request):
         form = TheOneMileTestForm(initial=initial_dict)
 
     context = {
-        # "test_urls": test_urls,
         "tests": tests,
         "form": form,
         "user": user,
@@ -218,18 +254,7 @@ def TheOneMileTestView(request):
 
 @login_required(login_url="login")
 def MaximumChestPressTestView(request):
-    test_urls = {
-    "The One Mile Test": "one-mile-test",
-    "Maximum Chest Press Test": "chest-press-test",
-    "The 60 Second Sit-up Test": "sit-up-test",
-    "The Push-up Test": "push-up-test",
-    "Sit-and-Reach Test": "sit-and-reach-test",
-    "Waist Hip Ratio": "waist-hip-ratio-test",
-    "Body Mass Index": "bmi-test",
-    "Body Fat": "body-fat-test",
-    "Visceral Fat Rating": "visceral-fat-test",
-    "Bone Mass": "bone-mass-test",
-}
+
     test_name = "Maximum Chest Press Test"
     user = request.user
     tests = MaximumChestPressTest.objects.filter(customer__user=user)
@@ -275,7 +300,6 @@ def MaximumChestPressTestView(request):
         form = MaximumChestPressTestForm(initial=initial_dict)
 
     context = {
-        # "test_urls": test_urls,
         "form": form,
         "tests": tests,
         "user": user,
@@ -911,3 +935,18 @@ def latestTestResultsView(request):
         "user_profile": user_profile,
     }
     return render(request, "latest_results.html", context=context)
+
+
+@login_required(login_url="login")
+def testGuideView(request):
+    user = request.user
+    try:
+        user_profile = UserProfile.objects.get(user=user)
+    except UserProfile.DoesNotExist:
+        return redirect("update_user_profile", user.id)
+
+    context = {
+        "user": user,
+        "user_profile": user_profile,
+    }
+    return render(request, "test_input.html", context=context)

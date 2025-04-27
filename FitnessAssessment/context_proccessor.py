@@ -1,5 +1,6 @@
 def global_urls(request):
     test_urls = {
+        "Test Guide": "test-guide",
         "The One Mile Test": "one-mile-test",
         "Maximum Chest Press Test": "chest-press-test",
         "The 60 Second Sit-up Test": "sit-up-test",

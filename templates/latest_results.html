@@ -3,7 +3,6 @@
 
 {% block content %}
 <div class="container mt-5">
-    
 
     <!-- User Details -->
     <div class="card mb-4 shadow-sm">
@@ -53,7 +52,7 @@
 
     <div class="text-center mt-3">
         <a href="{% url 'home' %}" class="btn btn-secondary">Home</a>
-        <a href="#" class="btn btn-primary">Take a New Test</a>
+        <a href="{% url 'test-guide' %}" class="btn btn-primary">Take a Test</a>
     </div>
 </div>
 {% endblock content %}
