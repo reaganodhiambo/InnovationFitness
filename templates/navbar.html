@@ -15,6 +15,9 @@
                     <a class="nav-link" href="{% url 'latest-results' %}">Test Summary</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'edit_user_profile' user.id %}">Update Profile</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                 </li>
                 {% else %}

@@ -10,11 +10,14 @@
       <h4 class="text-center mt-4 mb-4">Fitness Tests</h4>
       <ul class="list-group">
         {% for key, value in test_urls.items %}
+        {% if not value == "fitness-tests" %}
+          
         <a href="{% url value %}" class="text-decoration-none">
           <li class="list-group-item list-group-item-action">
             {{ key }}
           </li>
         </a>
+        {% endif %}
         {% endfor %}
       </ul>
     </div>
@@ -23,12 +26,14 @@
     <div class="col-md-9" id="main-content">
       {% if not form %}
       <div class="text-center mt-5">
-        <h2>Select a test from the sidebar</h2>
+        <h2>Pick A Test to Start</h2>
       </div>
       <div class="container mt-5">
         <h2 class="text-center mb-4">Fitness Tests</h2>
         <div class="row justify-content-center">
-          {% for key, value in test_urls.items %}
+          {% for key, value in test_urls.items %}    
+          {% if not value == "fitness-tests" %}
+            
           <div class="col-md-4 mb-3">
             <div class="card shadow-sm">
               <div class="card-body text-center">
@@ -37,6 +42,9 @@
               </div>
             </div>
           </div>
+          {% endif %}
+
+          
           {% endfor %}
         </div>
       </div>
@@ -99,7 +107,15 @@
           No tests have been taken yet.
         </div>
         {% endif %}
-        <a href="{% url 'latest-results' %}" class="btn btn-secondary w-100 mt-3">Test Summary</a>
+        <div class=" row justify-content-center">
+          <div class="col-md-3">
+            <a href="{% url 'fitness-tests' %}" class="btn btn-secondary w-100 mt-3 bg-primary">Perform Another Test</a>
+          </div>
+          <div class="col-md-3">
+
+            <a href="{% url 'home' %}" class="btn btn-secondary w-100 mt-3">Back Home</a>
+          </div>
+        </div>
       </div>
       {% endif %}
     </div>
@@ -113,7 +129,7 @@
 
   @media (max-width: 768px) {
     #sidebar {
-      height: auto;
+      display: none;
     }
   }
 </style>

@@ -62,13 +62,13 @@ def registerUser(request):
             user = form.save()
             login(request, user)
             return redirect("login")
+        
     else:
         form = UserRegistrationForm()
     context = {
         "form": form,
     }
     return render(request, "register.html", context=context)
-
 
 def loginUser(request):
     if request.method == "POST":
@@ -950,3 +950,53 @@ def testGuideView(request):
         "user_profile": user_profile,
     }
     return render(request, "test_input.html", context=context)
+
+
+@login_required(login_url="login")
+def finalScoreView(request):
+    user = request.user
+    try:
+        user_profile = UserProfile.objects.get(user=user)
+    except UserProfile.DoesNotExist:
+        return redirect("update_user_profile", user.id)
+
+    test_models = [
+        TheOneMileTest,
+        MaximumChestPressTest,
+        SixtySecondSitUpTest,
+        ThePushUpTest,
+        SitAndReachTest,
+        WaistHipRatioTest,
+        BMITest,
+        VisceralFatRatingTest,
+        BoneMassTest,
+        BodyFatTest,
+    ]
+
+    total_score = 0
+    pushup_score = 0
+    situp_score = 0
+
+    for model in test_models:
+        latest_result = (
+            model.objects.filter(customer__user=user).order_by("test_date").first()
+        )
+        if latest_result:
+            if isinstance(latest_result, ThePushUpTest):
+                pushup_score = latest_result.score / 2 
+            elif isinstance(latest_result, SixtySecondSitUpTest):
+                situp_score = latest_result.score / 2 
+            else:
+                total_score += latest_result.score
+
+    total_score += pushup_score + situp_score
+
+    final_score = min(total_score, 100)
+    print("Final Score: ", final_score)
+
+    context = {
+        "final_score": final_score,
+        "user": user,
+        "user_profile": user_profile,
+    }
+    return render(request, "final_score.html", context=context)

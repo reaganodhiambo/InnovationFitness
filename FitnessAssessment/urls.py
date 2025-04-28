@@ -23,6 +23,7 @@ urlpatterns = [
     path("bone-mass-test", BoneMassTestView, name="bone-mass-test"),
     path("body-fat-test", BodyFatTestView, name="body-fat-test"),
     path("latest-results", latestTestResultsView, name="latest-results"),
-    path("test-guide", testGuideView, name="test-guide"),
+    path("fitness-tests", testGuideView, name="fitness-tests"),
     path("edit-profile/<int:id>", editUserProfile, name="edit_user_profile"),
+    path("final-score", finalScoreView, name="final-score"),
 ]
