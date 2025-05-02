@@ -44,9 +44,9 @@ def index(request):
         latest_result = (
             model.objects.filter(customer__user=user).order_by("test_date").first()
         )
-        if latest_result:
-            latest_results[model._meta.verbose_name] = latest_result
-
+        # if latest_result:
+        #     latest_results[model._meta.verbose_name] = latest_result
+        latest_results[model._meta.verbose_name] = latest_result
     context = {
         "user": user,
         "user_profile": user_profile,
@@ -926,8 +926,8 @@ def latestTestResultsView(request):
         latest_result = (
             model.objects.filter(customer__user=user).order_by("test_date").first()
         )
-        if latest_result:
-            latest_results[model._meta.verbose_name] = latest_result
+       
+        latest_results[model._meta.verbose_name] = latest_result
 
     context = {
         "latest_results": latest_results,

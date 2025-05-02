@@ -19,7 +19,6 @@
     <h2 class="text-center mb-4 mt-4">Latest Test Results</h2>
     <div class="card shadow-sm">
         <div class="card-body">
-            {% if latest_results %}
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
@@ -32,27 +31,34 @@
                     </thead>
                     <tbody>
                         {% for test_name, result in latest_results.items %}
+                        {% if not result %}
                         <tr>
                             <td>{{ test_name }}</td>
                             <td>{{ result.test_date }}</td>
                             <td>{{ result.rating }}</td>
                             <td>{{ result.score }}</td>
+                   
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td>{{ test_name }}</td>
+                            <td>{{ result.test_date }}</td>
+                            <td>{{ result.rating }}</td>
+                            <td>{{ result.score }}</td>
+                     
+                            
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-            {% else %}
-            <div class="alert alert-warning text-center" role="alert">
-                No test results available.
-            </div>
-            {% endif %}
+        
         </div>
     </div>
 
     <div class="text-center mt-3">
         <a href="{% url 'home' %}" class="btn btn-secondary">Home</a>
-        <a href="{% url 'test-guide' %}" class="btn btn-primary">Take a Test</a>
+        <a href="{% url 'fitness-tests' %}" class="btn btn-primary">Take a Test</a>
     </div>
 </div>
 {% endblock content %}
